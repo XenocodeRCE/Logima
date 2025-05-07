@@ -1,0 +1,2644 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.lineicons.com/5.0/lineicons.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cal+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <title>✨ Logima | Carte argumentative et conceptuel</title>
+    <style>
+        :root {
+            --bg-color: #f0f2f5;
+            --panel-bg-color: #ffffff;
+            --text-color: #333;
+            --primary-color: #007aff;
+            --primary-hover-color: #0056b3;
+            --secondary-color: #6c757d;
+            --danger-color: #dc3545;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --edit-color: #5856d6; /* Nouvelle couleur pour le mode édition */
+            --info-color: #17a2b8; /* Couleur pour type "Prémisse" ou "Info" */
+            --data-color: #6f42c1; /* Couleur pour type "Donnée" */
+            --default-block-border-color: var(--primary-color); /* Couleur par défaut pour les blocs */
+            --border-color: #dee2e6;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+            --font-family: "Cal Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+
+            /* Couleurs pour nouveaux types de blocs */
+            --block-definition-color: #a06cd5; /* Violet doux */
+            --block-distinction-color: #56cfe1; /* Cyan clair */
+            --block-premise-color: var(--info-color); /* Réutilisation */
+            --block-consequence-color: #4ea8de; /* Bleu moyen */
+            --block-synthesis-color: #f7b801; /* Jaune doré */
+            --block-limit-color: var(--danger-color); /* Réutilisation */
+            --block-explanation-color: #72efdd; /* Turquoise */
+            --block-metaproposition-color: #b388eb; /* Lavande */
+            --block-problem-color: #ff8fab; /* Rose doux */
+            --block-thesis-color: var(--success-color); /* Vert soutenu */
+            --block-mainconclusion-color: #f25f5c; /* Rouge corail */
+
+            /* Couleurs pour types de liens */
+            --link-implication-color: #0077b6; /* Bleu foncé */
+            --link-justification-color: #52b788; /* Vert moyen */
+            --link-opposition-color: #d00000; /* Rouge vif */
+            --link-default-color: #495057; /* Gris foncé (actuel) */
+        }
+
+        body {
+            font-family: var(--font-family);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            overflow: hidden; /* Empêche le scroll du body */
+        }
+
+        /* Panneau de texte latéral */
+        .text-input-panel {
+            position: fixed;
+            top: 20px; /* Marge en haut */
+            left: -380px; /* Initialement caché (largeur + padding + marge) */
+            width: 340px;
+            height: calc(80% - 40px); /* Marge en haut et en bas */
+            background-color: var(--panel-bg-color);
+            box-shadow: 0 5px 20px var(--shadow-color);
+            /* padding: 20px; */ /* Padding géré par les sous-éléments */
+            transition: left 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+            z-index: 1001;
+            display: flex;
+            flex-direction: column;
+            border-radius: 16px; /* Bords arrondis plus prononcés */
+            overflow: hidden; /* Pour que les border-radius s'appliquent aux enfants */
+        }
+        .text-input-panel.open {
+            left: 20px; /* Apparaît avec une marge */
+        }
+        .text-input-panel .panel-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .text-input-panel .panel-header h3 {
+            margin: 0;
+            color: var(--primary-color);
+            font-weight: 500;
+            font-size: 1.1em;
+        }
+        .text-input-panel .close-panel-btn {
+            background: none; border: none; font-size: 1.8em; line-height: 1;
+            cursor: pointer; color: var(--secondary-color); padding: 0 5px;
+        }
+        .text-input-panel .close-panel-btn:hover { color: var(--text-color); }
+
+        .panel-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border-color);
+            background-color: #f8f9fa; /* Léger fond pour les onglets */
+        }
+        .panel-tabs button {
+            flex-grow: 1;
+            padding: 12px 10px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 0.9em;
+            color: var(--secondary-color);
+            border-bottom: 3px solid transparent;
+            transition: color 0.2s, border-bottom-color 0.2s;
+            font-weight: 500;
+        }
+        .panel-tabs button:hover {
+            color: var(--primary-color);
+        }
+        .panel-tabs button.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+        }
+
+        .panel-content {
+            flex-grow: 1;
+            padding: 15px;
+            overflow-y: auto;
+            display: none; /* Caché par défaut */
+        }
+        .panel-content.active {
+            display: flex; /* Affiché si actif */
+            flex-direction: column; /* Pour que le textarea prenne toute la place */
+        }
+        .panel-content textarea {
+            flex-grow: 1;
+            width: 100%;
+            box-sizing: border-box;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            font-size: 0.95em;
+            resize: none;
+            line-height: 1.6;
+        }
+        .panel-content textarea#jsonOutput {
+            font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+            background-color: #f8f9fa;
+            color: #333;
+            margin-bottom: 10px; /* Espace pour le bouton */
+        }
+        .panel-content .apply-json-btn {
+            padding: 8px 15px;
+            background-color: var(--success-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9em;
+            align-self: flex-end; /* Aligner le bouton à droite */
+            transition: background-color 0.2s;
+        }
+        .panel-content .apply-json-btn:hover {
+            background-color: #218838; /* Un vert plus foncé au survol */
+        }
+
+        /* Menu contextuel pour création de bloc */
+        /* SUPPRIMÉ: #textSelectionMenu et ses styles enfants */
+
+        /* Zone de travail principale */
+        .canvas-container {
+            flex-grow: 1;
+            overflow: hidden; /* Barres de défilement cachées */
+            position: relative;
+            width: 100%;
+            cursor: default; /* Curseur par défaut pour le conteneur */
+        }
+        .canvas-container.pan-mode { cursor: grab; }
+        .canvas-container.panning { cursor: grabbing; }
+
+        #canvas {
+            width: 8000px; /* Taille considérablement augmentée */
+            height: 7000px; /* Taille considérablement augmentée */
+            position: relative; /* Pour que le scrollLeft/Top du parent fonctionne */
+            background-image:
+                radial-gradient(circle at 1px 1px, rgba(0,0,0,0.07) 1px, transparent 0);
+            background-size: 25px 25px;
+            transform-origin: 0 0; /* Important pour le zoom futur si besoin */
+        }
+        /* Curseur spécifique pour le canvas selon le mode, si différent du container */
+        #canvas.connect-mode { cursor: crosshair; }
+        #canvas.edit-mode { cursor: default; } /* Ou un curseur 'text' sur les blocs */
+
+        /* Blocs de texte */
+        .text-block {
+            position: absolute; background-color: var(--panel-bg-color);
+            border: 1px solid var(--default-block-border-color); padding: 10px 14px;
+            border-radius: 10px; cursor: grab; min-width: 110px; min-height: 30px;
+            box-shadow: 0 4px 8px var(--shadow-color); overflow-wrap: break-word;
+            white-space: pre-wrap; max-width: 330px; max-height: 230px; overflow: auto;
+            font-size: 0.92em; line-height: 1.45;
+            transition: box-shadow 0.2s, border-color 0.2s, transform 0.15s ease-out;
+        }
+        .text-block:focus { outline: none; } /* Pour contentEditable */
+        .text-block[contenteditable="true"] {
+            cursor: text;
+            border-color: var(--edit-color);
+            box-shadow: 0 0 0 3.5px rgba(88, 86, 214, 0.45); /* Couleur d'édition */
+        }
+
+        .text-block.block-in-connect-mode { /* Nouvelle classe pour cacher l'overflow en mode connexion */
+            overflow: hidden !important;
+        }
+
+        .text-block.dragging { cursor: grabbing; z-index: 1000;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2); transform: scale(1.03);
+        }
+        .text-block.selected:not([contenteditable="true"]) { /* Ne pas appliquer si en édition */
+            border-color: var(--warning-color); border-width: 2px;
+            padding: calc(10px - 1px) calc(14px - 1px);
+            box-shadow: 0 0 0 3.5px rgba(255, 193, 7, 0.45);
+        }
+        .text-block.multi-selected:not([contenteditable="true"]) { /* Pour les autres éléments d'une multi-sélection */
+            border-color: var(--primary-color); border-width: 1.5px;
+            padding: calc(10px - 0.5px) calc(14px - 0.5px);
+            box-shadow: 0 0 0 2.5px color-mix(in srgb, var(--primary-color) 25%, transparent);
+        }
+        .text-block.pending-group-member { /* Style pour les blocs en attente de groupage */
+            outline: 2px dashed var(--info-color);
+            outline-offset: 2px;
+        }
+        .text-block.arrow-start:not([contenteditable="true"]) {
+            border-color: var(--success-color); border-width: 2px;
+            padding: calc(10px - 1px) calc(14px - 1px);
+            box-shadow: 0 0 0 3.5px rgba(40, 167, 69, 0.45);
+        }
+
+        /* Styles pour les types de blocs */
+        .text-block.type-premise {
+            border-color: var(--info-color);
+            border-width: 1.5px; padding: calc(10px - 0.5px) calc(14px - 0.5px);
+            box-shadow: 0 0 0 2.5px color-mix(in srgb, var(--info-color) 30%, transparent);
+        }
+        .text-block.type-conclusion {
+            border-color: var(--success-color);
+            border-width: 1.5px; padding: calc(10px - 0.5px) calc(14px - 0.5px);
+            box-shadow: 0 0 0 2.5px color-mix(in srgb, var(--success-color) 30%, transparent);
+        }
+        .text-block.type-explication {
+            border-color: var(--secondary-color);
+            border-width: 1.5px; padding: calc(10px - 0.5px) calc(14px - 0.5px);
+            box-shadow: 0 0 0 2.5px color-mix(in srgb, var(--secondary-color) 20%, transparent);
+        }
+        .text-block.type-argument { /* Style par défaut, peut aussi avoir un léger glow si désiré */
+            border-color: var(--default-block-border-color);
+            /* border-width: 1.5px; padding: calc(10px - 0.5px) calc(14px - 0.5px); */
+            /* box-shadow: 0 0 0 2.5px color-mix(in srgb, var(--default-block-border-color) 25%, transparent); */
+        }
+        .text-block.type-objection {
+            border-color: var(--danger-color);
+            border-width: 1.5px; padding: calc(10px - 0.5px) calc(14px - 0.5px);
+            box-shadow: 0 0 0 2.5px color-mix(in srgb, var(--danger-color) 30%, transparent);
+        }
+        .text-block.type-support {
+            border-color: var(--warning-color);
+            border-width: 1.5px; padding: calc(10px - 0.5px) calc(14px - 0.5px);
+            box-shadow: 0 0 0 2.5px color-mix(in srgb, var(--warning-color) 30%, transparent);
+        }
+        .text-block.type-donnee {
+            border-color: var(--data-color);
+            border-width: 1.5px; padding: calc(10px - 0.5px) calc(14px - 0.5px);
+            box-shadow: 0 0 0 2.5px color-mix(in srgb, var(--data-color) 30%, transparent);
+        }
+
+        /* Nouveaux styles pour les types de blocs */
+        .text-block.type-definition_rappel {
+            border-color: var(--block-definition-color);
+            box-shadow: 0 0 0 2.5px color-mix(in srgb, var(--block-definition-color) 30%, transparent);
+        }
+        .text-block.type-distinction_localisation {
+            border-color: var(--block-distinction-color);
+            box-shadow: 0 0 0 2.5px color-mix(in srgb, var(--block-distinction-color) 30%, transparent);
+        }
+        /* type-premise réutilise --info-color, déjà stylé */
+        .text-block.type-consequence_conclusion {
+            border-color: var(--block-consequence-color);
+            box-shadow: 0 0 0 2.5px color-mix(in srgb, var(--block-consequence-color) 30%, transparent);
+        }
+        .text-block.type-synthese {
+            border-color: var(--block-synthesis-color);
+            box-shadow: 0 0 0 2.5px color-mix(in srgb, var(--block-synthesis-color) 30%, transparent);
+        }
+        .text-block.type-limite_objection { /* Réutilise --danger-color */
+            border-color: var(--block-limit-color);
+            box-shadow: 0 0 0 2.5px color-mix(in srgb, var(--block-limit-color) 30%, transparent);
+        }
+        .text-block.type-explication_justification {
+            border-color: var(--block-explanation-color);
+            box-shadow: 0 0 0 2.5px color-mix(in srgb, var(--block-explanation-color) 30%, transparent);
+        }
+        .text-block.type-metaproposition_principe {
+            border-color: var(--block-metaproposition-color);
+            box-shadow: 0 0 0 2.5px color-mix(in srgb, var(--block-metaproposition-color) 30%, transparent);
+        }
+        .text-block.type-probleme_regression_analogie {
+            border-color: var(--block-problem-color);
+            box-shadow: 0 0 0 2.5px color-mix(in srgb, var(--block-problem-color) 30%, transparent);
+        }
+        .text-block.type-these_pivot_argument_cle { /* Réutilise --success-color */
+            border-color: var(--block-thesis-color);
+            box-shadow: 0 0 0 2.5px color-mix(in srgb, var(--block-thesis-color) 30%, transparent);
+        }
+        .text-block.type-conclusion_principale_solution {
+            border-color: var(--block-mainconclusion-color);
+            box-shadow: 0 0 0 2.5px color-mix(in srgb, var(--block-mainconclusion-color) 30%, transparent);
+        }
+        /* Ajustement général pour les blocs typés pour que le padding soit cohérent */
+        .text-block[class*="type-"]:not(.type-argument) { /* Sauf le type argument qui est le défaut */
+             border-width: 1.5px; padding: calc(10px - 0.5px) calc(14px - 0.5px);
+        }
+
+
+        /* Flèches SVG */
+        #arrowSvg {
+            position: absolute; top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none;
+        }
+        #arrowSvg path {
+            fill: none; stroke: var(--link-default-color); stroke-width: 2.2px;
+            pointer-events: stroke; cursor: pointer;
+            transition: stroke 0.2s, stroke-width 0.2s;
+        }
+        #arrowSvg path.selected { stroke: var(--warning-color); stroke-width: 3.8px; }
+        #arrowSvg .arrowhead { fill: var(--link-default-color); }
+        #arrowSvg .arrowheadSelected { fill: var(--warning-color); }
+
+        /* Styles pour les types de liens */
+        #arrowSvg path.arrow-type-implication { stroke: var(--link-implication-color); }
+        #arrowSvg path.arrow-type-implication + .arrowhead, /* Sélecteur pour la tête de flèche associée */
+        #arrowSvg path.arrow-type-implication.selected + .arrowheadSelected { fill: var(--link-implication-color); }
+        
+        #arrowSvg path.arrow-type-justification { stroke: var(--link-justification-color); }
+        #arrowSvg path.arrow-type-justification + .arrowhead,
+        #arrowSvg path.arrow-type-justification.selected + .arrowheadSelected { fill: var(--link-justification-color); }
+
+        #arrowSvg path.arrow-type-opposition { stroke: var(--link-opposition-color); /*stroke-dasharray: 5,5;*/}
+        #arrowSvg path.arrow-type-opposition + .arrowhead,
+        #arrowSvg path.arrow-type-opposition.selected + .arrowheadSelected { fill: var(--link-opposition-color); }
+        
+        /* Assurer que la tête de flèche sélectionnée garde la couleur du type si non survolée par warning */
+        #arrowSvg path.arrow-type-implication.selected ~ defs #arrowheadSelected polygon { fill: var(--link-implication-color); }
+        #arrowSvg path.arrow-type-justification.selected ~ defs #arrowheadSelected polygon { fill: var(--link-justification-color); }
+        #arrowSvg path.arrow-type-opposition.selected ~ defs #arrowheadSelected polygon { fill: var(--link-opposition-color); }
+        /* Style pour la tête de flèche quand la flèche est sélectionnée (priorité sur type) */
+         #arrowSvg path.selected + marker polygon { fill: var(--warning-color) !important; }
+
+
+        #arrowSvg text {
+            font-family: var(--font-family);
+            font-size: 12px;
+            fill: #333;
+            text-anchor: middle;
+            pointer-events: none; /* Le texte ne doit pas intercepter les clics pour la flèche */
+            -webkit-user-select: none; /* Safari */
+            -ms-user-select: none; /* IE 10+ */
+            user-select: none;
+        }
+        #arrowLabelInput {
+            position: absolute;
+            background-color: white;
+            border: 1px solid var(--primary-color);
+            border-radius: 4px;
+            padding: 4px 6px;
+            font-size: 12px;
+            z-index: 1050; /* Au-dessus des flèches et blocs */
+            box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+        }
+
+        .block-group {
+            position: absolute;
+            border: 2px dashed var(--secondary-color);
+            border-radius: 10px;
+            pointer-events: none; /* Le groupe lui-même n'est pas cliquable pour l'instant */
+            z-index: 0; /* Derrière les blocs, mais au-dessus du fond du canvas */
+            padding: 15px; /* Espace entre la bordure et les blocs contenus */
+            box-sizing: border-box;
+        }
+
+        .connection-point {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: var(--primary-color);
+            border: 1px solid white;
+            border-radius: 50%;
+            cursor: crosshair;
+            z-index: 1001; /* Au-dessus du bloc mais en dessous des éléments draggés */
+            transform: translate(-50%, -50%); /* Centrer le point */
+            box-shadow: 0 0 3px rgba(0,0,0,0.3);
+        }
+        .connection-point:hover {
+            background-color: var(--primary-hover-color);
+            transform: translate(-50%, -50%) scale(1.2);
+        }
+
+
+        /* Barre d'outils inférieure (Taskbar) */
+        .taskbar {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            background-color: rgba(255, 255, 255, 0.97); /* Légèrement plus opaque */
+            backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); /* Flou plus prononcé */
+            padding: 10px 15px; /* Ajusté */
+            border-radius: 28px; /* Ajusté */
+            box-shadow: 0 10px 30px rgba(0,0,0,0.18); /* Ombre plus douce et diffuse */
+            display: flex; gap: 6px; /* Espacement ajusté */
+            align-items: center; z-index: 1002;
+            transition: bottom 0.3s, opacity 0.3s, box-shadow 0.3s;
+        }
+        .taskbar button {
+            background-color: transparent; 
+            border: none; 
+            padding: 0;
+            border-radius: 12px; /* Moins arrondi pour un look plus moderne */
+            cursor: pointer; 
+            display: flex;
+            align-items: center; 
+            justify-content: center;
+            transition: background-color 0.25s ease-in-out, color 0.25s ease-in-out, box-shadow 0.25s ease-in-out, transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1); /* Transition améliorée */
+            color: var(--secondary-color); 
+            width: 42px; height: 42px; /* Taille ajustée */
+            position: relative; /* Pour le pseudo-élément de soulignement */
+            outline: none; /* Retirer l'outline par défaut au focus */
+        }
+        .taskbar button:hover { 
+            background-color: rgba(0,0,0,0.07); 
+            color: var(--text-color);
+            transform: translateY(-2px) scale(1.03); /* Effet de survol plus prononcé */
+        }
+        .taskbar button:active {
+            transform: translateY(0px) scale(0.95); /* Effet d'enfoncement au clic */
+            transition-duration: 0.05s; /* Réaction rapide au clic */
+        }
+
+        .taskbar button svg { 
+            width: 20px; height: 20px; /* Icônes légèrement ajustées */
+            transition: transform 0.2s ease-in-out; /* Pour subtil changement d'icône */
+        }
+
+        .taskbar button .lni { /* Taille pour les icônes de type fonte (LineIcons) */
+            font-size: 30px;
+        }
+        
+        .taskbar button.active {
+            box-shadow: 0 0 0 2px var(--panel-bg-color), 0 0 0 3.5px var(--primary-color); /* Bordure interne plus subtile */
+            color: white; /* Icône blanche sur fond coloré */
+            background-color: var(--primary-color); /* Couleur de fond pour l'état actif général */
+        }
+        /* Indicateur de soulignement pour les boutons actifs */
+        .taskbar button.active::after {
+            content: '';
+            position: absolute;
+            bottom: -4px; /* Position du soulignement */
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60%; /* Largeur du soulignement */
+            height: 3px; /* Épaisseur du soulignement */
+            background-color: var(--primary-color); /* Couleur du soulignement, correspond au bouton */
+            border-radius: 2px;
+            transition: background-color 0.25s, width 0.25s;
+        }
+
+        .taskbar button.active.edit-mode-active {
+            background-color: var(--edit-color); 
+            box-shadow: 0 0 0 2px var(--panel-bg-color), 0 0 0 3.5px var(--edit-color);
+        }
+        .taskbar button.active.edit-mode-active::after { background-color: var(--edit-color); }
+
+        .taskbar button.active.pan-mode-active {
+            background-color: var(--success-color);
+            box-shadow: 0 0 0 2px var(--panel-bg-color), 0 0 0 3.5px var(--success-color);
+        }
+        .taskbar button.active.pan-mode-active::after { background-color: var(--success-color); }
+
+        .taskbar button.active.zoom-mode-active {
+            background-color: var(--info-color);
+            box-shadow: 0 0 0 2px var(--panel-bg-color), 0 0 0 3.5px var(--info-color);
+        }
+        .taskbar button.active.zoom-mode-active::after { background-color: var(--info-color); }
+        
+        /* Style spécifique pour le bouton panneau de texte actif */
+        .taskbar button#toggleTextPanelBtn.active {
+            background-color: var(--secondary-color); /* Couleur distincte pour panneau ouvert */
+            box-shadow: 0 0 0 2px var(--panel-bg-color), 0 0 0 3.5px var(--secondary-color);
+        }
+        .taskbar button#toggleTextPanelBtn.active::after { background-color: var(--secondary-color); }
+
+        /* Style spécifique pour le bouton mode groupage actif */
+        .taskbar button#groupBlocksBtn.active {
+            background-color: var(--warning-color); /* Couleur distincte pour groupage actif */
+            box-shadow: 0 0 0 2px var(--panel-bg-color), 0 0 0 3.5px var(--warning-color);
+        }
+        .taskbar button#groupBlocksBtn.active::after { background-color: var(--warning-color); }
+
+
+        .taskbar button.active:hover { 
+            filter: brightness(115%); /* Légèrement plus lumineux au survol si actif */
+        }
+        /* Retrait des :hover spécifiques pour les modes actifs, car le filter:brightness gère bien */
+        /* .taskbar button.active.edit-mode-active:hover { background-color: #4a47d8; } */
+        /* .taskbar button.active.pan-mode-active:hover { background-color: #218838; } */
+        /* .taskbar button.active.zoom-mode-active:hover { background-color: #138496; } */
+
+
+        .taskbar button.delete-btn:hover { 
+            background-color: rgba(220, 53, 69, 0.15); 
+            color: var(--danger-color); 
+            transform: translateY(-2px) scale(1.03);
+        }
+        .taskbar button.delete-btn.active-warn {
+            background-color: var(--danger-color); color: white;
+            box-shadow: 0 0 0 2px var(--panel-bg-color), 0 0 0 3.5px var(--danger-color);
+        }
+        .taskbar button.delete-btn.active-warn::after { background-color: var(--danger-color); }
+
+        .taskbar button svg { 
+            width: 20px; height: 20px; /* Icônes légèrement ajustées */
+            transition: transform 0.2s ease-in-out; /* Pour subtil changement d'icône */
+        }
+        .taskbar button.active svg {
+            /* fill: white;  Déjà géré par color: white sur le bouton */
+            /* transform: scale(1.1); Optionnel: léger agrandissement de l'icône active */
+        }
+
+        .taskbar .separator { 
+            width: 1.5px; height: 22px; /* Plus visible */
+            background-color: #c8c8c8; /* Un peu plus foncé */
+            margin: 0 8px; /* Marge augmentée pour mieux séparer les groupes */
+            border-radius: 1px;
+        }
+
+        .taskbar button.history-btn:disabled {
+            opacity: 0.4; /* Plus transparent si désactivé */
+            cursor: not-allowed;
+            color: var(--secondary-color); /* Assurer que l'icône est grisée */
+        }
+        .taskbar button.history-btn:disabled:hover {
+            background-color: transparent;
+            transform: none; /* Pas d'effet de survol si désactivé */
+        }
+        .taskbar button.history-btn:disabled::after {
+            display: none; /* Pas de soulignement si désactivé */
+        }
+
+
+        @keyframes pulseAnimation {
+            0% { transform: scale(1); box-shadow: 0 0 0 2px var(--panel-bg-color), 0 0 0 3.5px currentColor; }
+            50% { transform: scale(1.05); box-shadow: 0 0 0 2px var(--panel-bg-color), 0 0 0 5.5px currentColor; }
+            100% { transform: scale(1); box-shadow: 0 0 0 2px var(--panel-bg-color), 0 0 0 3.5px currentColor; }
+        }
+
+        .taskbar button.mode-btn.active {
+            /* L'animation pulse peut être un peu distrayante, la retirer ou la rendre plus subtile si besoin */
+            /* animation: pulseAnimation 1.8s infinite cubic-bezier(0.4, 0, 0.2, 1); */
+        }
+
+        /* Styles responsifs */
+        @media (max-width: 700px) {
+            .taskbar { width: calc(100% - 20px); bottom: 10px; border-radius: 20px; padding: 8px; gap: 4px; }
+            .taskbar button { width: 38px; height: 38px; padding: 8px;}
+            .taskbar button svg { width: 18px; height: 18px; }
+            .text-input-panel { width: calc(100% - 20px); left: -100vw; top:10px; height: calc(100vh - 20px); border-radius: 10px; }
+            .text-input-panel.open { left: 10px; }
+            #textSelectionMenu { display: none !important; }
+        }
+
+        /* Menu contextuel pour type de bloc */
+        #blockContextMenu {
+            position: absolute;
+            background-color: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.18);
+            padding: 8px 0;
+            z-index: 1020;
+            display: none;
+            min-width: 180px;
+        }
+        #blockContextMenu ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        #blockContextMenu li {
+            padding: 10px 18px;
+            cursor: pointer;
+            font-size: 0.9em;
+            color: var(--text-color);
+            display: flex;
+            align-items: center;
+        }
+        #blockContextMenu li:hover {
+            background-color: rgba(0,0,0,0.05);
+        }
+        #blockContextMenu li .type-color-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 3px;
+            margin-right: 10px;
+            border: 1px solid rgba(0,0,0,0.1);
+        }
+
+        /* Menu contextuel pour type de lien */
+        #arrowContextMenu {
+            position: absolute;
+            background-color: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.18);
+            padding: 8px 0;
+            z-index: 1020;
+            display: none;
+            min-width: 200px; /* Un peu plus large pour les types de liens */
+        }
+        #arrowContextMenu ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        #arrowContextMenu li {
+            padding: 10px 18px;
+            cursor: pointer;
+            font-size: 0.9em;
+            color: var(--text-color);
+            display: flex;
+            align-items: center;
+        }
+        #arrowContextMenu li:hover {
+            background-color: rgba(0,0,0,0.05);
+        }
+        #arrowContextMenu li .type-color-indicator { /* Peut être réutilisé ou adapté */
+            width: 12px;
+            height: 12px;
+            border-radius: 3px; /* ou 50% pour un cercle */
+            margin-right: 10px;
+            border: 1px solid rgba(0,0,0,0.1);
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="text-input-panel" id="textInputPanel">
+        <div class="panel-header">
+            <h3>Panneau de Contrôle</h3>
+            <button class="close-panel-btn" id="closeTextPanelBtn" title="Fermer (Échap)">&times;</button>
+        </div>
+        <div class="panel-tabs">
+            <button id="tabYourText" class="active">Votre Texte</button>
+            <button id="tabSourceJson">La Source (JSON)</button>
+        </div>
+        <div id="contentYourText" class="panel-content active">
+            <textarea id="fullText" placeholder="Collez votre texte intégral ici..." draggable="true"></textarea>
+        </div>
+        <div id="contentSourceJson" class="panel-content">
+            <textarea id="jsonOutput" placeholder="Collez ou modifiez les données JSON du canevas ici..."></textarea>
+            <button id="applyJsonBtn" class="apply-json-btn">Appliquer JSON au Canevas</button>
+        </div>
+    </div>
+
+    <!-- SUPPRIMÉ: <div id="textSelectionMenu"> ... </div> -->
+
+    <div class="canvas-container" id="canvasContainer">
+        <div id="canvas" class="select-mode">
+            <svg id="arrowSvg">
+                <defs>
+                    <marker id="arrowhead" markerWidth="10" markerHeight="7"
+                    refX="8" refY="3.5" orient="auto-start-reverse" markerUnits="strokeWidth">
+                        <polygon points="0 0, 10 3.5, 0 7" class="arrowhead"/>
+                    </marker>
+                    <marker id="arrowheadSelected" markerWidth="10" markerHeight="7"
+                    refX="8" refY="3.5" orient="auto-start-reverse" markerUnits="strokeWidth">
+                        <polygon points="0 0, 10 3.5, 0 7" class="arrowheadSelected"/>
+                    </marker>
+                </defs>
+            </svg>
+        </div>
+    </div>
+
+    <div class="taskbar">
+        <button id="toggleTextPanelBtn" title="Panneau de Texte : Ouvrir/Fermer le panneau latéral (T)">
+        <i class="lni lni-menu-cheesburger"></i>
+        </button>
+        <button id="createEmptyBlockBtn" title="Nouveau Bloc : Créer un bloc de texte vide (N)">
+        <i class="lni lni-bulb-4"></i>
+        </button>
+        <button id="groupBlocksBtn" title="Mode Groupage : Sélectionner plusieurs blocs pour les grouper visuellement (G)">
+        <i class="lni lni-select-cursor-1"></i>
+        </button>
+        <div class="separator"></div>
+        <button id="undoBtn" class="history-btn" title="Annuler : Annuler la dernière action (Ctrl+Z)">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.5 8C9.85 8 7.45 8.99 5.6 10.6L2 7v9h9l-3.62-3.62C8.77 11.22 10.54 10.5 12.5 10.5c3.54 0 6.55 2.31 7.6 5.5l2.37-.78C20.36 11.36 16.76 8 12.5 8z"></path></svg>
+        </button>
+        <button id="redoBtn" class="history-btn" title="Refaire : Rétablir la dernière action annulée (Ctrl+Y)">
+            <svg viewBox="0 0 24 24" fill="currentColor" style="transform: scaleX(-1);"><path d="M11.5 8c-2.65 0-5.05.99-6.9 2.6L1 7v9h9l-3.62-3.62C7.77 11.22 9.54 10.5 11.5 10.5c3.54 0 6.55 2.31 7.6 5.5l2.37-.78C19.36 11.36 15.76 8 11.5 8z"></path></svg>
+        </button>
+        <div class="separator"></div>
+        <button id="modePanBtn" class="mode-btn" title="Mode Main/Déplacement : Naviguer sur le canevas en le faisant glisser (H)">
+        <i class="lni lni-hand-stop"></i>
+        </button>
+        <button id="modeSelectBtn" class="mode-btn" title="Mode Sélection : Sélectionner, déplacer et redimensionner les éléments (S)">
+        <i class="lni lni-location-arrow-right"></i>
+        </button>
+        <button id="modeConnectBtn" class="mode-btn" title="Mode Connexion : Créer des liens (flèches) entre les blocs (C)">
+        <i class="lni lni-vector-nodes-7"></i>
+        </button>
+        <button id="modeEditBtn" class="mode-btn" title="Mode Édition : Modifier le contenu textuel des blocs (E)">
+        <i class="lni lni-pen-to-square"></i>
+        </button>
+        <button id="modeZoomBtn" class="mode-btn" title="Mode Zoom : Activer le zoom avec la molette de la souris (Z ou Ctrl+Molette)">
+        <i class="lni lni-search-2"></i>
+        </button>
+        <div class="separator"></div>
+        <button id="deleteElementBtn" class="delete-btn" title="Supprimer : Effacer le(s) bloc(s) ou lien(s) sélectionné(s) (Suppr)">
+        <i class="lni lni-trash-3"></i>
+        </button>
+    </div>
+
+    <div id="blockContextMenu">
+        <ul>
+            <!-- Les options seront générées par JavaScript -->
+        </ul>
+    </div>
+    <div id="arrowContextMenu">
+        <ul>
+            <!-- Les options seront générées par JavaScript -->
+        </ul>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const textInputPanel = document.getElementById('textInputPanel');
+        const toggleTextPanelBtn = document.getElementById('toggleTextPanelBtn');
+        const closeTextPanelBtn = document.getElementById('closeTextPanelBtn');
+        
+        const fullTextInput = document.getElementById('fullText');
+        // const createBlockBtnTaskbar = document.getElementById('createBlockBtnTaskbar'); 
+        // Commenté car l'ID "createBlockBtnTaskbar" ne semble pas exister dans le HTML fourni, 
+        // ce qui causerait une erreur "addEventListener of null".
+        // Si ce bouton existe avec un autre ID, veuillez le corriger.
+
+        const tabYourText = document.getElementById('tabYourText');
+        const tabSourceJson = document.getElementById('tabSourceJson');
+        const contentYourText = document.getElementById('contentYourText');
+        const contentSourceJson = document.getElementById('contentSourceJson');
+        const jsonOutputTextarea = document.getElementById('jsonOutput');
+        const applyJsonBtn = document.getElementById('applyJsonBtn');
+        
+        /* SUPPRIMÉ: const textSelectionMenu = document.getElementById('textSelectionMenu'); */
+        /* SUPPRIMÉ: const createBlockFromMenuBtn = document.getElementById('createBlockFromMenuBtn'); */
+
+        const modePanBtn = document.getElementById('modePanBtn');
+        const modeSelectBtn = document.getElementById('modeSelectBtn');
+        const modeConnectBtn = document.getElementById('modeConnectBtn');
+        const modeEditBtn = document.getElementById('modeEditBtn');
+        const modeZoomBtn = document.getElementById('modeZoomBtn');
+
+        const deleteElementBtn = document.getElementById('deleteElementBtn');
+        const undoBtn = document.getElementById('undoBtn');
+        const redoBtn = document.getElementById('redoBtn');
+        const canvas = document.getElementById('canvas');
+        const canvasContainer = document.getElementById('canvasContainer');
+        const arrowSvg = document.getElementById('arrowSvg');
+
+        let blocks = {};
+        let arrows = {};
+        let currentMode = 'select'; // 'select', 'connect', 'pan', 'edit'
+        let arrowStartBlockId = null;
+        let selectedItems = []; // Changé de selectedItem à selectedItems (tableau)
+        let blockIdCounter = 0;
+        let arrowIdCounter = 0;
+        let draggedText = null;
+        let isGroupingModeActive = false;
+        let pendingGroupBlocks = new Set(); // Blocs sélectionnés pour le groupage
+        
+        let blockGroups = {}; // { groupId: { id: groupId, element: groupDiv, blockIds: Set } }
+        let groupIdCounter = 0; // Ajout de l'initialisation de groupIdCounter
+
+        let zoomLevel = 1;
+        const MAX_ZOOM = 5;
+        const MIN_ZOOM = 0.2;
+        const ZOOM_SENSITIVITY = 0.1;
+
+        let blockContextMenu = document.getElementById('blockContextMenu');
+        let currentContextMenuBlockId = null;
+        const blockTypes = {
+            // Anciens types commentés ou supprimés
+            // 'argument': { label: 'Argument', color: 'var(--default-block-border-color)' },
+            // 'premise': { label: 'Prémisse', color: 'var(--info-color)' },
+            // 'conclusion': { label: 'Conclusion', color: 'var(--success-color)' },
+            // 'explication': { label: 'Explication', color: 'var(--secondary-color)' },
+            // 'objection': { label: 'Objection', color: 'var(--danger-color)' },
+            // 'support': { label: 'Support', color: 'var(--warning-color)' },
+            // 'donnee': { label: 'Donnée', color: 'var(--data-color)' }
+
+            'definition_rappel': { label: 'Définition / Rappel', color: 'var(--block-definition-color)' },
+            'distinction_localisation': { label: 'Distinction / Localisation', color: 'var(--block-distinction-color)' },
+            'premise': { label: 'Prémisse', color: 'var(--block-premise-color)' }, // Réutilise --info-color via variable
+            'consequence_conclusion': { label: 'Conséquence / Conclusion', color: 'var(--block-consequence-color)' },
+            'synthese': { label: 'Synthèse', color: 'var(--block-synthesis-color)' },
+            'limite_objection': { label: 'Limite / Objection', color: 'var(--block-limit-color)' }, // Réutilise --danger-color
+            'explication_justification': { label: 'Explication / Justification', color: 'var(--block-explanation-color)' },
+            'metaproposition_principe': { label: 'Méta-proposition / Principe', color: 'var(--block-metaproposition-color)' },
+            'probleme_regression_analogie': { label: 'Problème / Régression / Analogie', color: 'var(--block-problem-color)' },
+            'these_pivot_argument_cle': { label: 'Thèse Pivot / Argument Clé', color: 'var(--block-thesis-color)' }, // Réutilise --success-color
+            'conclusion_principale_solution': { label: 'Conclusion Principale / Solution', color: 'var(--block-mainconclusion-color)' },
+            'argument': { label: 'Argument (par défaut)', color: 'var(--default-block-border-color)' } // Garder un type par défaut
+        };
+
+        let arrowContextMenu = document.getElementById('arrowContextMenu');
+        let currentContextMenuArrowId = null;
+        const arrowTypes = {
+            'default': { label: 'Lien (par défaut)', color: 'var(--link-default-color)'},
+            'implication': { label: 'Implication / Conséquence', color: 'var(--link-implication-color)' },
+            'justification': { label: 'Justification / Explication', color: 'var(--link-justification-color)' },
+            'opposition': { label: 'Opposition / Limite', color: 'var(--link-opposition-color)' }
+        };
+
+
+        let isPanning = false;
+        let lastPanX, lastPanY;
+        let currentlyEditingBlock = null; // ID du bloc en cours d'édition
+        let currentlyEditingArrowLabel = null; // ID de la flèche dont le label est en cours d'édition
+        const groupBlocksBtn = document.getElementById('groupBlocksBtn');
+        const createEmptyBlockBtn = document.getElementById('createEmptyBlockBtn');
+
+        // --- Historique Annuler/Refaire ---
+        let historyStack = [];
+        let historyPointer = -1;
+        const MAX_HISTORY_SIZE = 50;
+
+        function captureCanvasState() {
+            return {
+                blocks: JSON.parse(JSON.stringify(Object.values(blocks).map(b => ({
+                    id: b.id, text: b.text, x: b.x, y: b.y, type: b.type,
+                    // width: b.element.offsetWidth, height: b.element.offsetHeight // Peut être utile mais rend l'état plus lourd
+                })))),
+                arrows: JSON.parse(JSON.stringify(Object.values(arrows).map(a => ({
+                    id: a.id, startBlockId: a.startBlockId, endBlockId: a.endBlockId,
+                    label: a.label || '', type: a.type || 'default',
+                    startPointId: a.startPointId, endPointId: a.endPointId
+                })))),
+                blockGroups: JSON.parse(JSON.stringify(Object.values(blockGroups).map(g => ({
+                    id: g.id, blockIds: Array.from(g.blockIds)
+                })))),
+                blockIdCounter: blockIdCounter,
+                arrowIdCounter: arrowIdCounter,
+                groupIdCounter: groupIdCounter,
+                // État du canvas (zoom, scroll) - optionnel pour l'historique des actions sur éléments
+                // zoomLevel: zoomLevel,
+                // scrollLeft: canvasContainer.scrollLeft,
+                // scrollTop: canvasContainer.scrollTop
+            };
+        }
+
+        function loadCanvasState(state) {
+            if (!state) return;
+
+            clearAllBlocks();
+            clearAllArrows();
+            clearAllGroups();
+
+            blockIdCounter = state.blockIdCounter || 0;
+            arrowIdCounter = state.arrowIdCounter || 0;
+            groupIdCounter = state.groupIdCounter || 0;
+
+            if (state.blocks) {
+                state.blocks.forEach(blockData => {
+                    addBlockToCanvas(blockData.text, blockData.x, blockData.y, blockData.id, blockData.type, false);
+                });
+            }
+            if (state.arrows) {
+                state.arrows.forEach(arrowData => {
+                    if (blocks[arrowData.startBlockId] && blocks[arrowData.endBlockId]) {
+                        drawArrow(arrowData.startBlockId, arrowData.endBlockId, arrowData.id, false, arrowData.label, arrowData.startPointId, arrowData.endPointId, arrowData.type);
+                    }
+                });
+            }
+            if (state.blockGroups) {
+                state.blockGroups.forEach(groupData => {
+                     createBlockGroup(new Set(groupData.blockIds.filter(bId => blocks[bId])), groupData.id, false);
+                });
+            }
+            
+            // Restaurer la visibilité des points de connexion si on est en mode connexion
+            if (currentMode === 'connect') {
+                showConnectionPointsOnAllBlocks();
+            }
+            // Appliquer la classe pour l'overflow des blocs si en mode connexion
+            if (currentMode === 'connect') {
+                Object.values(blocks).forEach(b => b.element.classList.add('block-in-connect-mode'));
+            }
+
+
+            deselectAll();
+            // Ne pas changer de mode lors du chargement d'un état d'historique
+        }
+
+        function saveHistoryState() {
+            const state = captureCanvasState();
+            
+            // Si le pointeur n'est pas à la fin de la pile, c'est qu'on a fait un "undo"
+            // et qu'on effectue une nouvelle action. Il faut donc tronquer l'historique "futur".
+            if (historyPointer < historyStack.length - 1) {
+                historyStack = historyStack.slice(0, historyPointer + 1);
+            }
+
+            historyStack.push(state);
+            if (historyStack.length > MAX_HISTORY_SIZE) {
+                historyStack.shift(); // Enlever l'état le plus ancien
+            } else {
+                historyPointer++;
+            }
+            // Si on a shifté, le pointeur est déjà correct car il pointe sur le dernier élément.
+            // Si on n'a pas shifté, on incrémente.
+            // Ajustement: le pointeur doit toujours être historyStack.length - 1 après un push normal.
+            historyPointer = historyStack.length - 1;
+
+
+            updateUndoRedoButtons();
+        }
+        
+        function undoState() {
+            if (historyPointer > 0) {
+                historyPointer--;
+                loadCanvasState(historyStack[historyPointer]);
+                updateUndoRedoButtons();
+            }
+        }
+
+        function redoState() {
+            if (historyPointer < historyStack.length - 1) {
+                historyPointer++;
+                loadCanvasState(historyStack[historyPointer]);
+                updateUndoRedoButtons();
+            }
+        }
+
+        function updateUndoRedoButtons() {
+            undoBtn.disabled = historyPointer <= 0;
+            redoBtn.disabled = historyPointer >= historyStack.length - 1;
+        }
+
+        undoBtn.addEventListener('click', undoState);
+        redoBtn.addEventListener('click', redoState);
+
+
+        // --- Gestion du Panneau de Texte ---
+        // (Identique à la version précédente, donc omis pour la brièveté ici, mais présent dans le code complet)
+        toggleTextPanelBtn.addEventListener('click', () => togglePanel());
+        closeTextPanelBtn.addEventListener('click', () => togglePanel(false));
+        function togglePanel(forceOpen) {
+            const isOpen = textInputPanel.classList.contains('open');
+            if (typeof forceOpen === 'boolean') {
+                textInputPanel.classList.toggle('open', forceOpen);
+            } else {
+                textInputPanel.classList.toggle('open');
+            }
+            // La classe 'active' est maintenant gérée par les styles CSS pour le bouton lui-même
+            // et son pseudo-élément ::after.
+            toggleTextPanelBtn.classList.toggle('active', textInputPanel.classList.contains('open'));
+            if (textInputPanel.classList.contains('open')) {
+                // Focus sur le textarea de l'onglet actif
+                if (contentYourText.classList.contains('active')) {
+                    fullTextInput.focus();
+                }
+            } else {
+                /* SUPPRIMÉ: hideTextSelectionMenu(); */
+            }
+        }
+
+        // --- Gestion des Onglets du Panneau Latéral ---
+        tabYourText.addEventListener('click', () => switchTab('yourText'));
+        tabSourceJson.addEventListener('click', () => switchTab('sourceJson'));
+        applyJsonBtn.addEventListener('click', applyJsonToCanvas);
+
+        function switchTab(tabName) {
+            if (tabName === 'yourText') {
+                tabYourText.classList.add('active');
+                tabSourceJson.classList.remove('active');
+                contentYourText.classList.add('active');
+                contentSourceJson.classList.remove('active');
+                fullTextInput.focus();
+            } else if (tabName === 'sourceJson') {
+                tabYourText.classList.remove('active');
+                tabSourceJson.classList.add('active');
+                contentYourText.classList.remove('active');
+                contentSourceJson.classList.add('active');
+                generateAndDisplayJson();
+                jsonOutputTextarea.focus();
+            }
+        }
+
+        function generateAndDisplayJson() {
+            const canvasData = {
+                canvasState: {
+                    zoomLevel: zoomLevel,
+                    scrollLeft: canvasContainer.scrollLeft,
+                    scrollTop: canvasContainer.scrollTop,
+                    canvasWidth: canvas.offsetWidth,
+                    canvasHeight: canvas.offsetHeight
+                },
+                blocks: Object.values(blocks).map(b => ({
+                    id: b.id,
+                    text: b.text,
+                    x: b.x,
+                    y: b.y,
+                    type: b.type,
+                    // Pourrait ajouter width/height si nécessaire, mais ils sont dynamiques
+                    // width: b.element.offsetWidth, 
+                    // height: b.element.offsetHeight
+                })),
+                arrows: Object.values(arrows).map(a => ({
+                    id: a.id,
+                    startBlockId: a.startBlockId,
+                    endBlockId: a.endBlockId,
+                    label: a.label || '',
+                    type: a.type || 'default', // Sauvegarder le type de flèche
+                    startPointId: a.startPointId, // Sauvegarder point de connexion
+                    endPointId: a.endPointId     // Sauvegarder point de connexion
+                })),
+                blockIdCounter: blockIdCounter,
+                arrowIdCounter: arrowIdCounter,
+                groups: Object.values(blockGroups).map(g => ({
+                    id: g.id,
+                    blockIds: Array.from(g.blockIds)
+                })),
+                groupIdCounter: groupIdCounter
+            };
+            jsonOutputTextarea.value = JSON.stringify(canvasData, null, 2); // 2 espaces pour l'indentation
+        }
+
+        function clearAllBlocks() {
+            for (const blockId in blocks) {
+                if (blocks[blockId] && blocks[blockId].element) {
+                    blocks[blockId].element.remove();
+                }
+            }
+            blocks = {};
+        }
+
+        function clearAllArrows() {
+            for (const arrowId in arrows) {
+                if (arrows[arrowId] && arrows[arrowId].element) {
+                    arrows[arrowId].element.remove();
+                }
+                if (arrows[arrowId] && arrows[arrowId].textElement) {
+                    arrows[arrowId].textElement.remove();
+                }
+            }
+            arrows = {};
+            // Vider également les définitions de marker si nécessaire, ou s'assurer qu'elles ne sont pas dupliquées
+            // Pour l'instant, on les laisse, car elles sont statiques.
+        }
+
+        function clearAllGroups() {
+            for (const groupId in blockGroups) {
+                if (blockGroups[groupId] && blockGroups[groupId].element) {
+                    blockGroups[groupId].element.remove();
+                }
+            }
+            blockGroups = {};
+        }
+        
+        function loadCanvasFromJson(jsonData) {
+            clearAllBlocks();
+            clearAllArrows();
+            clearAllGroups();
+
+            // Restaurer l'état du canevas
+            if (jsonData.canvasState) {
+                applyZoom(jsonData.canvasState.zoomLevel || 1, 0, 0); // Zoom sans pivot spécifique
+                canvasContainer.scrollLeft = jsonData.canvasState.scrollLeft || 0;
+                canvasContainer.scrollTop = jsonData.canvasState.scrollTop || 0;
+                // Les dimensions du canvas sont gérées par CSS, mais on pourrait les stocker/restaurer si elles étaient dynamiques
+            }
+
+            // Mettre à jour les compteurs d'ID
+            blockIdCounter = jsonData.blockIdCounter || 0;
+            arrowIdCounter = jsonData.arrowIdCounter || 0;
+            groupIdCounter = jsonData.groupIdCounter || 0;
+
+            // Recréer les blocs
+            if (jsonData.blocks && Array.isArray(jsonData.blocks)) {
+                jsonData.blocks.forEach(blockData => {
+                    if (blockData.id && blockData.text && blockData.x !== undefined && blockData.y !== undefined) {
+                        addBlockToCanvas(blockData.text, blockData.x, blockData.y, blockData.id, blockData.type, false);
+                    }
+                });
+            }
+
+            // Recréer les flèches
+            if (jsonData.arrows && Array.isArray(jsonData.arrows)) {
+                jsonData.arrows.forEach(arrowData => {
+                    if (arrowData.id && arrowData.startBlockId && arrowData.endBlockId) {
+                        // S'assurer que les blocs de début et de fin existent avant de dessiner la flèche
+                        if (blocks[arrowData.startBlockId] && blocks[arrowData.endBlockId]) {
+                            drawArrow(
+                                arrowData.startBlockId, 
+                                arrowData.endBlockId, 
+                                arrowData.id, 
+                                false, 
+                                arrowData.label || '', 
+                                arrowData.startPointId, 
+                                arrowData.endPointId,
+                                arrowData.type || 'default' // Charger le type de flèche
+                            );
+                        }
+                    }
+                });
+            }
+
+            // Recréer les groupes
+            if (jsonData.groups && Array.isArray(jsonData.groups)) {
+                jsonData.groups.forEach(groupData => {
+                    if (groupData.id && groupData.blockIds && groupData.blockIds.length > 0) {
+                        createBlockGroup(new Set(groupData.blockIds.filter(bId => blocks[bId])), groupData.id, false);
+                    }
+                });
+            }
+
+            // S'assurer que tous les compteurs sont au moins aussi élevés que le max des ID existants
+            let maxBlockNum = 0;
+            Object.keys(blocks).forEach(id => {
+                const num = parseInt(id.split('-')[1]);
+                if (num > maxBlockNum) maxBlockNum = num;
+            });
+            blockIdCounter = Math.max(blockIdCounter, maxBlockNum);
+
+            let maxArrowNum = 0;
+            Object.keys(arrows).forEach(id => {
+                const num = parseInt(id.split('-')[1]);
+                if (num > maxArrowNum) maxArrowNum = num;
+            });
+            arrowIdCounter = Math.max(arrowIdCounter, maxArrowNum);
+
+            let maxGroupNum = 0;
+            Object.keys(blockGroups).forEach(id => {
+                const num = parseInt(id.split('-')[1]);
+                if (num > maxGroupNum) maxGroupNum = num;
+            });
+            groupIdCounter = Math.max(groupIdCounter, maxGroupNum);
+
+
+            deselectAll(); // Désélectionner tout après le chargement
+            setMode('select'); // Revenir au mode sélection par défaut
+        }
+
+        function applyJsonToCanvas() {
+            try {
+                const jsonData = JSON.parse(jsonOutputTextarea.value);
+                // Validation basique (peut être étendue)
+                if (typeof jsonData === 'object' && jsonData !== null) {
+                    loadCanvasFromJson(jsonData); // loadCanvasFromJson gère le nettoyage
+                    saveHistoryState(); // Sauvegarder cet état comme point de départ
+                    alert("Structure JSON appliquée avec succès !");
+                } else {
+                    alert("Erreur : Le JSON fourni n'est pas un objet valide.");
+                }
+            } catch (error) {
+                alert("Erreur de parsing JSON : \n" + error.message);
+                console.error("Erreur de parsing JSON:", error);
+            }
+        }
+
+        /* SUPPRIMÉ: --- Menu Contextuel --- et toutes ses fonctions et écouteurs associés */
+        /* (fullTextInput.addEventListener('mouseup', ...), fullTextInput.addEventListener('blur', ...), document.addEventListener('mousedown', ... pour textSelectionMenu), hideTextSelectionMenu(), createBlockFromMenuBtn.addEventListener('click', ...)) */
+
+        // --- Drag and Drop de texte ---
+        // (Identique à la version précédente)
+        fullTextInput.addEventListener('dragstart', (e) => { /* ... */ });
+        fullTextInput.addEventListener('dragend', () => { /* ... */ });
+        canvasContainer.addEventListener('dragover', (e) => { /* ... */ }); // Écouteur sur container
+        canvasContainer.addEventListener('drop', (e) => { // Écouteur sur container
+            e.preventDefault();
+            const text = e.dataTransfer.getData('text/plain');
+            if (text) {
+                const containerRect = canvasContainer.getBoundingClientRect();
+                const xOnCanvas = (e.clientX - containerRect.left + canvasContainer.scrollLeft) / zoomLevel;
+                const yOnCanvas = (e.clientY - containerRect.top + canvasContainer.scrollTop) / zoomLevel;
+                
+                createBlockFromText(text, xOnCanvas, yOnCanvas);
+                // Optionnel: supprimer le texte glissé
+                // fullTextInput.value = fullTextInput.value.replace(text, ''); 
+                fullTextInput.setSelectionRange(0,0);
+                window.getSelection().removeAllRanges();
+            }
+            canvas.classList.remove('dragging-text');
+        });
+        // Pour le dragstart sur fullTextInput (pour que le code soit complet)
+        fullTextInput.addEventListener('dragstart', (e) => {
+            const selection = window.getSelection().toString().trim();
+            if (selection) {
+                e.dataTransfer.setData('text/plain', selection);
+                e.dataTransfer.effectAllowed = 'copy';
+                draggedText = selection; 
+                canvas.classList.add('dragging-text'); // Peut-être sur canvasContainer aussi
+            } else {
+                e.preventDefault(); 
+            }
+        });
+        fullTextInput.addEventListener('dragend', () => {
+            draggedText = null;
+            canvas.classList.remove('dragging-text');
+        });
+         canvasContainer.addEventListener('dragover', (e) => {
+            if (e.dataTransfer.types.includes('text/plain')) {
+                e.preventDefault(); 
+                e.dataTransfer.dropEffect = 'copy';
+            }
+        });
+
+        // --- Gestion des Modes ---
+        function setMode(newMode) {
+            if (currentlyEditingBlock) stopEditingBlock(currentlyEditingBlock, true); // Sauvegarder si on change de mode
+
+            const oldMode = currentMode; // Capturer l'ancien mode pour la gestion des points de connexion
+            currentMode = newMode;
+
+            // Gérer l'état actif pour tous les boutons de mode
+            [modePanBtn, modeSelectBtn, modeConnectBtn, modeEditBtn, modeZoomBtn].forEach(btn => {
+                btn.classList.remove('active', 'pan-mode-active', 'edit-mode-active', 'zoom-mode-active');
+            });
+
+            if (newMode === 'pan') {
+                modePanBtn.classList.add('active', 'pan-mode-active');
+            } else if (newMode === 'select') {
+                modeSelectBtn.classList.add('active'); // Style actif par défaut
+            } else if (newMode === 'connect') {
+                modeConnectBtn.classList.add('active'); // Style actif par défaut
+            } else if (newMode === 'edit') {
+                modeEditBtn.classList.add('active', 'edit-mode-active');
+            } else if (newMode === 'zoom') {
+                modeZoomBtn.classList.add('active', 'zoom-mode-active');
+            }
+            
+            canvasContainer.classList.toggle('pan-mode', newMode === 'pan');
+            canvas.classList.toggle('connect-mode', newMode === 'connect');
+            canvas.classList.toggle('edit-mode', newMode === 'edit');
+
+            if (newMode !== 'connect' && arrowStartBlockId) {
+                if (blocks[arrowStartBlockId]) blocks[arrowStartBlockId].element.classList.remove('arrow-start');
+                arrowStartBlockId = null;
+            }
+            if (newMode !== 'select' && newMode !== 'edit') deselectAll();
+
+            // Gestion des points de connexion et de la classe 'block-in-connect-mode'
+            // (Déplacé dans la fonction setMode surchargée plus bas pour une meilleure organisation)
+        }
+        modePanBtn.addEventListener('click', () => setMode('pan'));
+        modeSelectBtn.addEventListener('click', () => setMode('select'));
+        modeConnectBtn.addEventListener('click', () => setMode('connect'));
+        modeEditBtn.addEventListener('click', () => setMode('edit'));
+        modeZoomBtn.addEventListener('click', () => setMode('zoom'));
+
+        // --- Mode Main (Panoramique) ---
+        canvasContainer.addEventListener('mousedown', (e) => {
+            if (currentMode === 'pan' && e.button === 0) { // Bouton gauche uniquement
+                isPanning = true;
+                lastPanX = e.clientX;
+                lastPanY = e.clientY;
+                canvasContainer.classList.add('panning');
+                e.preventDefault(); // Empêcher la sélection de texte ou autre
+            }
+        });
+        document.addEventListener('mousemove', (e) => { // Écouter sur document pour un drag fluide
+            if (!isPanning) return;
+            const dx = e.clientX - lastPanX;
+            const dy = e.clientY - lastPanY;
+            canvasContainer.scrollLeft -= dx;
+            canvasContainer.scrollTop -= dy;
+            lastPanX = e.clientX;
+            lastPanY = e.clientY;
+        });
+        document.addEventListener('mouseup', (e) => {
+            if (isPanning) {
+                isPanning = false;
+                canvasContainer.classList.remove('panning');
+            }
+        });
+        // Permettre le scroll avec la molette même si overflow est hidden
+        canvasContainer.addEventListener('wheel', (e) => {
+            // Si on n'est pas en train de panner manuellement, permettre le scroll à la molette
+            // Le comportement par défaut du wheel scroll le parent s'il a du contenu qui dépasse
+            // et est scrollable (même si overflow:hidden, le JS peut le scroller).
+            // Pas besoin de code spécifique ici si le comportement natif est souhaité.
+            // Si on voulait un contrôle plus fin (ex: zoom), il faudrait e.preventDefault() et gérer ici.
+            if (e.ctrlKey || currentMode === 'zoom') {
+                e.preventDefault();
+                const rect = canvasContainer.getBoundingClientRect();
+                const mouseXInContainer = e.clientX - rect.left;
+                const mouseYInContainer = e.clientY - rect.top;
+
+                const scrollAmount = -e.deltaY;
+                let newZoomLevel = zoomLevel * (1 + scrollAmount * ZOOM_SENSITIVITY * 0.01); // Ajuster sensibilité
+                newZoomLevel = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, newZoomLevel));
+                
+                applyZoom(newZoomLevel, mouseXInContainer, mouseYInContainer);
+            }
+        }, { passive: false }); // passive:false pour preventDefault
+
+        // --- Raccourcis Clavier ---
+        document.addEventListener('keydown', (e) => {
+            if (document.activeElement === fullTextInput || (currentlyEditingBlock && document.activeElement === blocks[currentlyEditingBlock]?.element)) {
+                 if (e.key === 'Escape') {
+                    if (currentlyEditingBlock) stopEditingBlock(currentlyEditingBlock, false); // Annuler édition
+                    else togglePanel(false); // Fermer panneau texte
+                    e.preventDefault();
+                } else if (e.key === 'Enter' && currentlyEditingBlock && !e.shiftKey) {
+                    e.preventDefault();
+                    stopEditingBlock(currentlyEditingBlock, true); // Sauvegarder édition
+                }
+                return;
+            }
+            // if (e.ctrlKey || e.metaKey || e.altKey) return; // Modifié pour permettre Ctrl +/-,
+
+            if (e.ctrlKey || e.metaKey) {
+                switch (e.key.toLowerCase()) { // Convertir en minuscule pour 'Z' et 'Y'
+                    case '+':
+                    case '=': // Pour le + sans Shift sur certains claviers
+                        e.preventDefault();
+                        zoomOnCenter(zoomLevel * 1.2);
+                        break;
+                    case '-':
+                        e.preventDefault();
+                        zoomOnCenter(zoomLevel / 1.2);
+                        break;
+                    case '0':
+                        e.preventDefault();
+                        resetZoom();
+                        break;
+                    case 'z':
+                        e.preventDefault();
+                        undoState();
+                        break;
+                    case 'y':
+                        e.preventDefault();
+                        redoState();
+                        break;
+                }
+                return; // Ne pas traiter d'autres raccourcis si Ctrl est pressé
+            }
+            if (e.altKey) return;
+
+            // Si un input de label de flèche est actif, ne pas traiter les raccourcis globaux (sauf Escape)
+            if (document.getElementById('arrowLabelInput') && e.key !== 'Escape') {
+                return;
+            }
+
+            switch (e.key.toLowerCase()) {
+                case 'h': setMode('pan'); e.preventDefault(); break; // H pour Hand tool
+                case 's': setMode('select'); e.preventDefault(); break;
+                case 'c': setMode('connect'); e.preventDefault(); break;
+                case 'e': setMode('edit'); e.preventDefault(); break; // E pour Edit tool
+                case 'z': setMode('zoom'); e.preventDefault(); break; // Z pour Zoom tool
+                case 'n': handleCreateEmptyBlock(); e.preventDefault(); break; // N pour Nouveau bloc vide
+                case 'g': 
+                    toggleGroupingMode(); 
+                    e.preventDefault(); 
+                    break; 
+                case 't': togglePanel(); e.preventDefault(); break;
+                case 'delete': case 'backspace':
+                    if (selectedItems.length > 0) { e.preventDefault(); deleteSelectedItems(); }
+                    break;
+                case 'escape':
+                    if (isGroupingModeActive) {
+                        cancelGroupingMode();
+                        e.preventDefault();
+                    } else if (currentlyEditingBlock) {
+                        stopEditingBlock(currentlyEditingBlock, false); // Annuler
+                        e.preventDefault();
+                    } else if (currentMode === 'connect' && arrowStartBlockId) {
+                        if (blocks[arrowStartBlockId]) blocks[arrowStartBlockId].element.classList.remove('arrow-start');
+                        arrowStartBlockId = null;
+                        e.preventDefault();
+                    } else if (selectedItems.length > 0) {
+                        deselectAll();
+                        e.preventDefault();
+                    } else {
+                        togglePanel(false);
+                        e.preventDefault();
+                    }
+                    hideBlockContextMenu(); // Cacher aussi le menu contextuel
+                    hideArrowContextMenu(); // Cacher aussi le menu contextuel des flèches
+                    if (document.getElementById('arrowLabelInput')) { // Si l'input de label de flèche est ouvert
+                        cancelArrowLabelEdit();
+                    }
+                    break;
+                case 'enter':
+                    if (isGroupingModeActive && pendingGroupBlocks.size > 0) {
+                        finalizeGrouping();
+                        e.preventDefault();
+                    }
+                    break;
+            }
+        });
+
+        // --- Création de Blocs ---
+        createEmptyBlockBtn.addEventListener('click', handleCreateEmptyBlock);
+
+        function handleCreateEmptyBlock() {
+            if (isGroupingModeActive) cancelGroupingMode(); // Quitter le mode groupage si actif
+            const containerRect = canvasContainer.getBoundingClientRect();
+            const x = (canvasContainer.scrollLeft + containerRect.width / 2 - 75) / zoomLevel; // 75 = approx half block width
+            const y = (canvasContainer.scrollTop + containerRect.height / 2 - 25) / zoomLevel; // 25 = approx half block height
+            
+            const newBlockId = addBlockToCanvas("[Écrivez ici...]", Math.max(0, x), Math.max(0, y), null, null, false);
+            if (newBlockId) {
+                setMode('edit'); // Passer en mode édition pour que startEditingBlock fonctionne correctement
+                startEditingBlock(newBlockId);
+                saveHistoryState(); // Sauvegarder après création
+                // Pas besoin de selectItem explicitement si startEditingBlock le gère ou si le mode edit le fait.
+            }
+        }
+
+        // (Identique, sauf createBlockFromText)
+        // createBlockBtnTaskbar.addEventListener('click', () => { /* ... */ }); 
+        // Commenté car createBlockBtnTaskbar est probablement null.
+        function createBlockFromText(text, x, y) {
+            const containerRect = canvasContainer.getBoundingClientRect();
+            // Ajuster pour le zoom lors de la création manuelle
+            const initialX = x !== undefined ? x : (canvasContainer.scrollLeft + containerRect.width / 2 - 75) / zoomLevel;
+            const initialY = y !== undefined ? y : (canvasContainer.scrollTop + containerRect.height / 2 - 25) / zoomLevel;
+            addBlockToCanvas(text, Math.max(0, initialX), Math.max(0, initialY));
+            saveHistoryState(); // Sauvegarder après création par drag-drop
+        }
+        // Pour createBlockBtnTaskbar (pour que le code soit complet)
+        /* Commenté car createBlockBtnTaskbar est probablement null
+        createBlockBtnTaskbar.addEventListener('click', () => {
+            if (!textInputPanel.classList.contains('open')) {
+                togglePanel(true); 
+                alert("Panneau de texte ouvert. Sélectionnez du texte puis cliquez à nouveau pour créer un bloc.");
+                return;
+            }
+            const selectedText = fullTextInput.value.substring(fullTextInput.selectionStart, fullTextInput.selectionEnd).trim();
+            if (selectedText) {
+                createBlockFromText(selectedText);
+                fullTextInput.setSelectionRange(fullTextInput.selectionEnd, fullTextInput.selectionEnd); 
+            } else {
+                alert("Veuillez sélectionner du texte dans le panneau pour créer un bloc.");
+                fullTextInput.focus();
+            }
+        });
+        */
+
+        function addBlockToCanvas(text, x, y, existingId = null, existingType = null, autoSelectAndSwitchMode = true) {
+            let blockId;
+            if (existingId && blocks[existingId]) { // Si l'ID existe déjà, on ne devrait pas recréer. Géré par clearAllBlocks.
+                console.warn(`Tentative de recréer un bloc existant avec ID: ${existingId}. Cela ne devrait pas arriver si clearAllBlocks a été appelé.`);
+                return; // Ou mettre à jour le bloc existant si c'est le comportement souhaité.
+            }
+
+            if (existingId) {
+                blockId = existingId;
+                // Assurer que blockIdCounter est au moins le numéro de cet ID
+                const idNum = parseInt(existingId.split('-')[1]);
+                if (!isNaN(idNum)) {
+                    blockIdCounter = Math.max(blockIdCounter, idNum);
+                }
+            } else {
+                blockIdCounter++;
+                blockId = 'block-' + blockIdCounter;
+            }
+
+            const blockElement = document.createElement('div');
+            blockElement.classList.add('text-block');
+            blockElement.id = blockId;
+            blockElement.textContent = text; // Utiliser textContent pour l'ajout initial
+            blockElement.style.left = x + 'px';
+            blockElement.style.top = y + 'px';
+
+            const blockType = existingType || 'argument'; // 'argument' est le type par défaut
+            blocks[blockId] = { id: blockId, element: blockElement, x: x, y: y, text: text, type: blockType };
+            blockElement.classList.add(`type-${blockType}`);
+
+            canvas.appendChild(blockElement);
+            makeDraggable(blockElement, blocks[blockId]);
+            blocks[blockId].connectionPoints = []; // Initialiser pour les points de connexion
+            
+            // Appliquer la classe pour l'overflow si on est en mode connexion
+            if (currentMode === 'connect') {
+                blockElement.classList.add('block-in-connect-mode');
+            }
+
+            blockElement.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (currentlyEditingBlock && currentlyEditingBlock !== blockId) {
+                    stopEditingBlock(currentlyEditingBlock, true); // Sauvegarder l'ancien bloc
+                }
+
+                if (isGroupingModeActive) {
+                    if (e.shiftKey) {
+                        toggleBlockForGrouping(blockId);
+                    }
+                } else if (currentMode === 'connect') {
+                    // Le clic sur le bloc lui-même en mode connexion est géré par les points de connexion
+                    // ou par handleArrowEndpointSelection(blockId) si on clique sur le bloc et non un point.
+                    // Pour l'instant, on laisse handleArrowEndpointSelection gérer le clic sur le bloc.
+                    // Si on veut forcer le clic sur un point, il faudrait désactiver le clic sur le bloc ici.
+                } else if (currentMode === 'edit') {
+                    startEditingBlock(blockId);
+                } else if (currentMode === 'select') {
+                    selectItem(blockId, 'block', e.shiftKey);
+                }
+            });
+
+            blockElement.addEventListener('dblclick', (e) => {
+                e.stopPropagation();
+                if (currentlyEditingBlock && currentlyEditingBlock !== blockId) {
+                    stopEditingBlock(currentlyEditingBlock, true);
+                }
+                startEditingBlock(blockId);
+            });
+
+            blockElement.addEventListener('contextmenu', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                if (currentMode === 'select') {
+                    selectItem(blockId, 'block'); // Sélectionner le bloc avant d'afficher le menu
+                    showBlockContextMenu(blockId, e.pageX, e.pageY);
+                }
+            });
+
+            if (autoSelectAndSwitchMode) {
+                setMode('select');
+                selectItem(blockId, 'block');
+                // saveHistoryState(); // Sauvegarder après sélection? Peut-être trop fréquent. A évaluer.
+            }
+            // Ne pas appeler saveHistoryState ici directement, car addBlockToCanvas est aussi utilisé par loadCanvasState.
+            // Les appels à saveHistoryState sont faits par les fonctions initiatrices (handleCreateEmptyBlock, createBlockFromText, etc.)
+            return blockId; // Retourner l'ID du bloc créé
+        }
+
+        function makeDraggable(element, blockObject) {
+            // (Identique à la version précédente)
+             let isDragging = false;
+            let dragStartPageX, dragStartPageY, initialBlockLeft, initialBlockTop;
+
+            element.addEventListener('mousedown', (e) => {
+                // Ne pas drag si on édite ce bloc, ou si ce n'est pas le mode select, ou pas bouton gauche
+                if (element.isContentEditable || currentMode !== 'select' || e.button !== 0) return; 
+                
+                isDragging = true;
+                element.classList.add('dragging');
+                dragStartPageX = e.pageX;
+                dragStartPageY = e.pageY;
+                initialBlockLeft = element.offsetLeft; // Coordonnées relatives au parent (canvas)
+                initialBlockTop = element.offsetTop;
+                if (!e.shiftKey) { // Si shift n'est pas pressé, et que le bloc n'est pas déjà dans la sélection multiple
+                    let isAlreadySelected = selectedItems.some(item => item.id === blockObject.id && item.type === 'block');
+                    if (!isAlreadySelected) {
+                        selectItem(blockObject.id, 'block', false);
+                    } else if (selectedItems.length > 1) {
+                        // Si le bloc est déjà sélectionné dans une sélection multiple,
+                        // et qu'on clique sans shift, on veut peut-être juste le dragger sans changer la sélection multiple.
+                        // Mais pour la cohérence, un clic simple sans shift refait la sélection.
+                        // Pour l'instant, on garde le comportement de refaire la sélection.
+                        // Si on voulait permettre de dragger un élément d'une multi-sélection sans la changer,
+                        // il faudrait une logique plus complexe ici.
+                    }
+                } else { // Si shift est pressé, on s'assure qu'il est sélectionné pour le drag
+                    selectItem(blockObject.id, 'block', true); // Ajoute ou garde dans la sélection
+                }
+                // e.preventDefault(); // Peut causer des soucis avec contentEditable si mal géré
+            });
+            document.addEventListener('mousemove', (e) => {
+                if (!isDragging) return;
+                let deltaX = (e.pageX - dragStartPageX) / zoomLevel; // Ajuster le delta par le zoom
+                let deltaY = (e.pageY - dragStartPageY) / zoomLevel; // Ajuster le delta par le zoom
+                
+                let newX = initialBlockLeft + deltaX;
+                let newY = initialBlockTop + deltaY;
+
+                // Contraintes pour ne pas sortir du canvas (dimensions du canvas non-zoomé)
+                newX = Math.max(0, Math.min(newX, canvas.offsetWidth - element.offsetWidth));
+                newY = Math.max(0, Math.min(newY, canvas.offsetHeight - element.offsetHeight));
+                
+                element.style.left = newX + 'px';
+                element.style.top = newY + 'px';
+                blockObject.x = newX;
+                blockObject.y = newY;
+                updateArrowsForBlock(blockObject.id);
+                // Mettre à jour le groupe si le bloc en fait partie
+                for (const groupId in blockGroups) {
+                    if (blockGroups[groupId].blockIds.has(blockObject.id)) {
+                        updateBlockGroupBounds(groupId);
+                    }
+                }
+            });
+            document.addEventListener('mouseup', () => {
+                if (isDragging) {
+                    isDragging = false;
+                    element.classList.remove('dragging');
+                    saveHistoryState(); // Sauvegarder l'état après le déplacement
+                }
+            });
+        }
+
+        // --- Édition de Texte des Blocs ---
+        function startEditingBlock(blockId) {
+            if (!blocks[blockId]) return;
+            if (isGroupingModeActive) cancelGroupingMode(); // Quitter le mode groupage
+            if (currentlyEditingBlock) stopEditingBlock(currentlyEditingBlock, true); // Sauvegarder l'ancien
+
+            const blockElement = blocks[blockId].element;
+            currentlyEditingBlock = blockId;
+            
+            // Mettre le texte actuel dans l'élément pour contentEditable.
+            // textContent est plus sûr que innerHTML pour éviter XSS si le texte venait d'ailleurs.
+            blockElement.textContent = blocks[blockId].text; 
+            blockElement.setAttribute('contenteditable', 'true');
+            blockElement.focus();
+            
+            // Sélectionner tout le texte pour faciliter l'édition
+            const range = document.createRange();
+            range.selectNodeContents(blockElement);
+            const sel = window.getSelection();
+            sel.removeAllRanges();
+            sel.addRange(range);
+
+            // Désélectionner au sens "selectedItem" pour éviter confusion de style
+            if (selectedItems.length === 1 && selectedItems[0].id === blockId) {
+                // On ne désélectionne pas ici, car l'édition est un état temporaire.
+                // La classe .selected sera retirée par stopEditingBlock si besoin.
+            }
+            blockElement.classList.add('editing'); // Classe pour style si besoin (déjà géré par [contenteditable="true"])
+        }
+
+        function stopEditingBlock(blockId, saveChanges) {
+            if (!blocks[blockId] || !currentlyEditingBlock || currentlyEditingBlock !== blockId) return;
+            
+            const blockElement = blocks[blockId].element;
+            blockElement.removeAttribute('contenteditable');
+            blockElement.classList.remove('editing');
+
+            if (saveChanges) {
+                const newText = blockElement.textContent.trim(); // Utiliser textContent pour récupérer le texte
+                if (blocks[blockId].text !== newText) { // Sauvegarder seulement si le texte a changé
+                    blocks[blockId].text = newText;
+                    if (newText === "") {
+                        blockElement.textContent = "[Vide]";
+                        blocks[blockId].text = "[Vide]";
+                    } else {
+                        blockElement.textContent = newText;
+                    }
+                    saveHistoryState(); // Sauvegarder après modification du texte
+                }
+            } else {
+                // Rétablir le texte original si on annule
+                blockElement.textContent = blocks[blockId].text;
+            }
+            currentlyEditingBlock = null;
+            // Potentiellement resélectionner le bloc si c'était l'intention
+            // selectItem(blockId, 'block');
+        }
+
+        // --- Gestion des Flèches Courbées ---
+        // (Identique à la version précédente)
+        function handleArrowEndpointSelection(blockId, connectionPointId = null) {
+            if (!blocks[blockId]) return;
+            // Si on est en mode groupage, ne pas initier de flèche
+            if (isGroupingModeActive) return;
+
+            if (!arrowStartBlockId) {
+                arrowStartBlockId = blockId;
+                arrowStartPointId = connectionPointId; // Stocker l'ID du point de départ
+                blocks[blockId].element.classList.add('arrow-start');
+                // Visuellement, on pourrait aussi mettre en évidence le point de connexion cliqué
+            } else {
+                if (arrowStartBlockId === blockId && arrowStartPointId === connectionPointId) {
+                    // Si on reclique sur le même bloc/point, annuler le départ de la flèche
+                    blocks[arrowStartBlockId].element.classList.remove('arrow-start');
+                    arrowStartBlockId = null;
+                    arrowStartPointId = null;
+                    return;
+                }
+                const endBlockId = blockId;
+                const endPointId = connectionPointId; // Stocker l'ID du point d'arrivée
+                drawArrow(arrowStartBlockId, endBlockId, null, true, '', arrowStartPointId, endPointId, 'default'); // 'default' type for new arrows
+                blocks[arrowStartBlockId].element.classList.remove('arrow-start');
+                arrowStartBlockId = null;
+                arrowStartPointId = null;
+                setMode('select');
+                saveHistoryState(); // Sauvegarder après création de flèche
+            }
+        }
+        function drawArrow(startId, endId, existingId = null, autoSelectAndSwitchMode = true, existingLabel = '', startPtId = null, endPtId = null, existingType = 'default') {
+            let arrowId;
+            if (existingId) {
+                arrowId = existingId;
+                const idNum = parseInt(existingId.split('-')[1]);
+                if (!isNaN(idNum)) {
+                    arrowIdCounter = Math.max(arrowIdCounter, idNum);
+                }
+            } else {
+                arrowIdCounter++;
+                arrowId = 'arrow-' + arrowIdCounter;
+            }
+
+            const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            path.id = arrowId;
+            path.setAttribute('marker-end', 'url(#arrowhead)');
+            arrowSvg.appendChild(path);
+
+            const textElement = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            textElement.setAttribute('id', 'label-' + arrowId);
+            textElement.textContent = existingLabel;
+            arrowSvg.appendChild(textElement);
+
+            const arrowType = existingType || 'default';
+            arrows[arrowId] = { 
+                id: arrowId, 
+                element: path, 
+                startBlockId: startId, 
+                endBlockId: endId,
+                label: existingLabel,
+                textElement: textElement,
+                startPointId: startPtId, 
+                endPointId: endPtId,
+                type: arrowType // Stocker le type de la flèche
+            };
+            path.classList.add(`arrow-type-${arrowType}`);
+            // La tête de flèche prendra la couleur via CSS en fonction de la classe de la flèche
+            
+            updateArrowPosition(arrows[arrowId]);
+
+            path.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (currentMode === 'select') selectItem(arrowId, 'arrow');
+            });
+            path.addEventListener('dblclick', (e) => {
+                e.stopPropagation();
+                // Permettre l'édition du label de flèche, par exemple en mode select ou edit
+                if (currentMode === 'select' || currentMode === 'edit') {
+                    startEditingArrowLabel(arrowId, e);
+                }
+            });
+            path.addEventListener('contextmenu', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                if (currentMode === 'select') { // Ou tout mode où la sélection de flèche est permise
+                    selectItem(arrowId, 'arrow'); // Sélectionner la flèche avant d'afficher le menu
+                    showArrowContextMenu(arrowId, e.pageX, e.pageY);
+                }
+            });
+
+            if (autoSelectAndSwitchMode) {
+                 selectItem(arrowId, 'arrow'); // Sélection simple par défaut
+                 // saveHistoryState(); // Sauvegarder après sélection? A évaluer.
+            }
+            // Ne pas appeler saveHistoryState ici, car drawArrow est aussi utilisé par loadCanvasState.
+            // L'appel est fait par handleArrowEndpointSelection.
+        }
+        function updateArrowsForBlock(blockId) {
+            for (const arrowId in arrows) {
+                const arrow = arrows[arrowId];
+                if (arrow.startBlockId === blockId || arrow.endBlockId === blockId) {
+                    updateArrowPosition(arrow);
+                }
+            }
+        }
+        function updateArrowPosition(arrow) {
+            const startBlock = blocks[arrow.startBlockId];
+            const endBlock = blocks[arrow.endBlockId];
+            if (!startBlock || !endBlock) return;
+
+            const startP = getBlockConnectorPoint(startBlock, arrow.startPointId);
+            const endP = getBlockConnectorPoint(endBlock, arrow.endPointId);
+
+            if (!startP || !endP) { // Si un point de connexion n'est pas valide
+                console.warn("Point de connexion invalide pour la flèche:", arrow.id);
+                arrow.element.setAttribute('d', `M 0 0 L 0 0`); // Cacher la flèche
+                if (arrow.textElement) arrow.textElement.textContent = '';
+                return;
+            }
+            
+            // S'assurer que la classe de type est bien sur l'élément path
+            if (arrow.type && arrowTypes[arrow.type]) {
+                Object.keys(arrowTypes).forEach(typeKey => {
+                    arrow.element.classList.remove(`arrow-type-${typeKey}`);
+                });
+                arrow.element.classList.add(`arrow-type-${arrow.type}`);
+            } else { // Fallback au type par défaut si non défini
+                 arrow.element.classList.add(`arrow-type-default`);
+            }
+            // La couleur de la tête de flèche est gérée par CSS en fonction de la classe de la flèche
+            // et de son état de sélection.
+            // Si la flèche est sélectionnée, le marker 'arrowheadSelected' est utilisé.
+            // Sinon, 'arrowhead' est utilisé. Les couleurs de ces markers sont définies en CSS.
+            // Pour que la tête de flèche prenne la couleur du type, les styles CSS ont été adaptés.
+            // (voir les sélecteurs path.arrow-type-* + .arrowhead et path.arrow-type-*.selected + .arrowheadSelected)
+
+            // Calcul des points de contrôle pour une courbe de Bézier cubique (C)
+            // M P0 C P1 P2 P3
+            // P0 = startP, P3 = endP
+            let cp1 = { x: startP.x, y: startP.y };
+            let cp2 = { x: endP.x, y: endP.y };
+            const offset = 60; // Distance de sortie/entrée des points de contrôle
+
+            // Ajuster cp1 en fonction du point de sortie
+            switch (arrow.startPointId) {
+                case 'top':    cp1.y -= offset; break;
+                case 'bottom': cp1.y += offset; break;
+                case 'left':   cp1.x -= offset; break;
+                case 'right':  cp1.x += offset; break;
+            }
+
+            // Ajuster cp2 en fonction du point d'entrée
+            switch (arrow.endPointId) {
+                case 'top':    cp2.y -= offset; break;
+                case 'bottom': cp2.y += offset; break;
+                case 'left':   cp2.x -= offset; break;
+                case 'right':  cp2.x += offset; break;
+            }
+            
+            // Pour éviter que les flèches ne se croisent trop si les blocs sont très proches
+            // et que les points de contrôle se "croisent", on peut limiter l'offset
+            const dxTotal = endP.x - startP.x;
+            const dyTotal = endP.y - startP.y;
+            const dist = Math.sqrt(dxTotal*dxTotal + dyTotal*dyTotal);
+
+            if (dist < offset * 2.5) { // Si la distance est faible
+                // Réduire l'offset ou utiliser une quadratique simple
+                // Pour l'instant, on peut juste utiliser un offset plus petit ou une ligne droite
+                // ou une quadratique comme avant pour les cas très courts.
+                // Ici, on va juste utiliser les points de contrôle calculés,
+                // mais on pourrait ajouter une logique pour les rendre moins extrêmes.
+                // Par exemple, faire en sorte que cp1 et cp2 ne dépassent pas le milieu du segment P0P3.
+                
+                // Simple ajustement pour que les points de contrôle ne se "croisent" pas trop
+                // de manière agressive sur de courtes distances.
+                // Si la flèche va principalement horizontalement
+                if (Math.abs(dxTotal) > Math.abs(dyTotal)) {
+                    if ((arrow.startPointId === 'right' && arrow.endPointId === 'left' && startP.x > endP.x) ||
+                        (arrow.startPointId === 'left' && arrow.endPointId === 'right' && startP.x < endP.x)) {
+                        // Inversion, les blocs se font face
+                        cp1.x = startP.x + dxTotal / 3;
+                        cp2.x = endP.x - dxTotal / 3;
+                        cp1.y = startP.y + dyTotal / 3; // Ajoute une petite courbure verticale
+                        cp2.y = endP.y - dyTotal / 3;
+                    }
+                } else { // Si la flèche va principalement verticalement
+                     if ((arrow.startPointId === 'bottom' && arrow.endPointId === 'top' && startP.y > endP.y) ||
+                        (arrow.startPointId === 'top' && arrow.endPointId === 'bottom' && startP.y < endP.y)) {
+                        // Inversion
+                        cp1.y = startP.y + dyTotal / 3;
+                        cp2.y = endP.y - dyTotal / 3;
+                        cp1.x = startP.x + dxTotal / 3; // Ajoute une petite courbure horizontale
+                        cp2.x = endP.x - dxTotal / 3;
+                    }
+                }
+            }
+
+
+            arrow.element.setAttribute('d', `M ${startP.x} ${startP.y} C ${cp1.x} ${cp1.y}, ${cp2.x} ${cp2.y}, ${endP.x} ${endP.y}`);
+
+            if (arrow.textElement) {
+                // Positionner le label au milieu de la courbe de Bézier cubique (approximatif pour t=0.5)
+                // B(t) = (1-t)^3 P0 + 3(1-t)^2 t P1 + 3(1-t) t^2 P2 + t^3 P3
+                // Pour t=0.5: (P0 + 3P1 + 3P2 + P3) / 8
+                const labelX = (startP.x + 3 * cp1.x + 3 * cp2.x + endP.x) / 8;
+                const labelY = (startP.y + 3 * cp1.y + 3 * cp2.y + endP.y) / 8;
+                arrow.textElement.setAttribute('x', labelX);
+                arrow.textElement.setAttribute('y', labelY - 7); // Petit décalage au-dessus
+                arrow.textElement.textContent = arrow.label || '';
+            }
+        }
+        function getBlockConnectorPoint(blockObject, specificPointId) {
+            if (!blockObject || !blockObject.element || !specificPointId) return null;
+
+            const blockElem = blockObject.element;
+            const blockX = blockObject.x; // Coordonnée X du coin supérieur gauche du bloc sur le canvas
+            const blockY = blockObject.y; // Coordonnée Y du coin supérieur gauche du bloc sur le canvas
+            const width = blockElem.offsetWidth;
+            const height = blockElem.offsetHeight;
+
+            switch (specificPointId) {
+                case 'top':    return { x: blockX + width / 2, y: blockY };
+                case 'bottom': return { x: blockX + width / 2, y: blockY + height };
+                case 'left':   return { x: blockX,             y: blockY + height / 2 };
+                case 'right':  return { x: blockX + width,     y: blockY + height / 2 };
+                default:       
+                    console.warn(`Point de connexion inconnu: ${specificPointId}`);
+                    // Fallback au centre du bloc si le point n'est pas reconnu
+                    return { x: blockX + width / 2, y: blockY + height / 2};
+            }
+        }
+
+        // --- Sélection et Suppression ---
+        // (Légèrement modifié pour gérer l'arrêt de l'édition)
+        canvasContainer.addEventListener('click', (e) => { // Écouteur sur container
+            if (e.target === canvasContainer || e.target === canvas) { // Clic sur fond
+                let modeOnClick = currentMode; // Capturer le mode au moment du clic
+
+                if (currentlyEditingBlock) {
+                    stopEditingBlock(currentlyEditingBlock, true); // Sauvegarder
+                    // currentMode n'est pas changé par stopEditingBlock.
+                    // Si on était en train d'éditer un bloc, modeOnClick serait 'edit' (ou le mode actif lors du début de l'édition).
+                }
+
+                // Si le mode était 'edit' (soit en éditant un bloc, soit en mode 'edit' sans bloc actif)
+                if (modeOnClick === 'edit') {
+                    setMode('select'); // Passer en mode sélection
+                    deselectAll();     // Désélectionner tous les éléments
+                } else if (currentMode === 'select') { 
+                    // Si le mode était déjà 'select' (et aucun bloc n'était en cours d'édition)
+                    deselectAll();
+                } else if (currentMode === 'connect' && arrowStartBlockId) {
+                    // Si on était en train de commencer une flèche en mode connexion
+                    if (blocks[arrowStartBlockId]) blocks[arrowStartBlockId].element.classList.remove('arrow-start');
+                    arrowStartBlockId = null;
+                }
+                
+                hideBlockContextMenu();
+                hideArrowContextMenu(); // Cacher aussi le menu des flèches
+            }
+        });
+        
+        function selectItem(itemId, type, isMultiSelect = false) {
+            if (currentlyEditingBlock) stopEditingBlock(currentlyEditingBlock, true);
+            if (isGroupingModeActive) return; // Ne pas faire de sélection normale en mode groupage
+
+            const currentSelectionIndex = selectedItems.findIndex(item => item.id === itemId && item.type === type);
+
+            if (isMultiSelect) {
+                if (currentSelectionIndex > -1) { // Déjà sélectionné, on le retire (toggle)
+                    selectedItems.splice(currentSelectionIndex, 1);
+                    // La mise à jour visuelle sera gérée par updateSelectionVisuals()
+                } else { // Pas encore sélectionné, on l'ajoute
+                    selectedItems.push({ id: itemId, type: type });
+                }
+            } else { // Sélection simple
+                // Nettoyer tous les styles de sélection précédents et vider la liste
+                selectedItems.forEach(item => {
+                    if (item.type === 'block' && blocks[item.id]) {
+                        blocks[item.id].element.classList.remove('selected', 'multi-selected');
+                    } else if (item.type === 'arrow' && arrows[item.id]) {
+                        arrows[item.id].element.classList.remove('selected');
+                        arrows[item.id].element.setAttribute('marker-end', 'url(#arrowhead)');
+                    }
+                });
+                selectedItems = []; // Vider la liste
+
+                // Ajouter l'élément cliqué comme seule sélection.
+                // Si on voulait un comportement de désélection en cliquant sur un item déjà sélectionné seul,
+                // il faudrait ajouter une condition ici pour ne pas le rajouter.
+                // Comportement actuel : un clic sélectionne toujours (ou resélectionne).
+                selectedItems.push({ id: itemId, type: type });
+            }
+            updateSelectionVisuals();
+            deleteElementBtn.classList.toggle('active-warn', selectedItems.length > 0);
+        }
+
+        function updateSelectionVisuals() {
+            // D'abord, retirer toutes les classes de sélection de tous les éléments
+            Object.values(blocks).forEach(b => b.element.classList.remove('selected', 'multi-selected'));
+            Object.values(arrows).forEach(a => {
+                a.element.classList.remove('selected');
+                a.element.setAttribute('marker-end', 'url(#arrowhead)');
+            });
+
+            if (selectedItems.length === 1) {
+                const item = selectedItems[0];
+                if (item.type === 'block' && blocks[item.id]) {
+                    blocks[item.id].element.classList.add('selected');
+                } else if (item.type === 'arrow' && arrows[item.id]) {
+                    arrows[item.id].element.classList.add('selected');
+                    arrows[item.id].element.setAttribute('marker-end', 'url(#arrowheadSelected)');
+                    arrowSvg.appendChild(arrows[item.id].element); // Pour le z-index
+                }
+            } else if (selectedItems.length > 1) {
+                selectedItems.forEach(item => {
+                    if (item.type === 'block' && blocks[item.id]) {
+                        blocks[item.id].element.classList.add('multi-selected');
+                    } else if (item.type === 'arrow' && arrows[item.id]) {
+                        // Multi-sélection de flèches pourrait avoir un style différent, ou juste 'selected'
+                        arrows[item.id].element.classList.add('selected');
+                        arrows[item.id].element.setAttribute('marker-end', 'url(#arrowheadSelected)');
+                        arrowSvg.appendChild(arrows[item.id].element);
+                    }
+                });
+                // Optionnel: le "dernier" item ajouté à la multi-sélection pourrait avoir le style 'selected'
+                // const lastSelectedItem = selectedItems[selectedItems.length - 1];
+                // if (lastSelectedItem.type === 'block' && blocks[lastSelectedItem.id]) {
+                //     blocks[lastSelectedItem.id].element.classList.remove('multi-selected');
+                //     blocks[lastSelectedItem.id].element.classList.add('selected');
+                // }
+            }
+        }
+
+
+        function deselectAll() { // L'argument keepCurrentForSingleReselect n'est plus nécessaire
+            // Ne pas désélectionner si un bloc est en cours d'édition active (focus)
+            if (currentlyEditingBlock && document.activeElement === blocks[currentlyEditingBlock]?.element) return;
+            
+            // Si on est en mode groupage, deselectAll ne doit pas vider pendingGroupBlocks.
+            // La sélection normale (selectedItems) est déjà gérée par toggleGroupingMode.
+            if (isGroupingModeActive) { 
+                return;
+            }
+            
+            selectedItems.forEach(item => {
+                if (item.type === 'block' && blocks[item.id]) {
+                    blocks[item.id].element.classList.remove('selected', 'multi-selected');
+                } else if (item.type === 'arrow' && arrows[item.id]) {
+                    arrows[item.id].element.classList.remove('selected');
+                    arrows[item.id].element.setAttribute('marker-end', 'url(#arrowhead)');
+                }
+            });
+            selectedItems = [];
+
+            hideBlockContextMenu(); // Cacher le menu contextuel lors de la désélection
+            hideArrowContextMenu(); // Cacher aussi le menu contextuel des flèches
+            deleteElementBtn.classList.remove('active-warn');
+            if (document.getElementById('arrowLabelInput')) { // Si on désélectionne pendant l'édition d'un label
+                saveAndCloseArrowLabelEdit();
+            }
+        }
+
+        function deleteSelectedItems() {
+            if (selectedItems.length === 0) return;
+
+            selectedItems.forEach(item => {
+                if (currentlyEditingBlock && item.type === 'block' && item.id === currentlyEditingBlock) {
+                    stopEditingBlock(currentlyEditingBlock, false); 
+                }
+                if (item.type === 'block') {
+                    const blockId = item.id;
+                    if (!blocks[blockId]) return;
+
+                    // Retirer le bloc de tous les groupes auxquels il appartient
+                    for (const groupId in blockGroups) {
+                        if (blockGroups[groupId].blockIds.has(blockId)) {
+                            removeBlockFromGroup(blockId, groupId, true); // true pour indiquer suppression du bloc
+                        }
+                    }
+
+                    const arrowsToDelete = [];
+                    for (const arrowId in arrows) {
+                        if (arrows[arrowId].startBlockId === blockId || arrows[arrowId].endBlockId === blockId) {
+                            arrowsToDelete.push(arrowId);
+                        }
+                    }
+                    arrowsToDelete.forEach(arrowId => {
+                        if (arrows[arrowId]) {
+                            if (arrows[arrowId].textElement) arrows[arrowId].textElement.remove();
+                            arrows[arrowId].element.remove();
+                            delete arrows[arrowId];
+                        }
+                    });
+                    blocks[blockId].element.remove();
+                    delete blocks[blockId];
+
+                } else if (item.type === 'arrow') {
+                    const arrowId = item.id;
+                    if (!arrows[arrowId]) return;
+                    if (arrows[arrowId].textElement) arrows[arrowId].textElement.remove();
+                    arrows[arrowId].element.remove();
+                    delete arrows[arrowId];
+                    if (currentlyEditingArrowLabel === arrowId) { 
+                        cancelArrowLabelEdit();
+                    }
+                }
+            });
+            
+            selectedItems = [];
+            deleteElementBtn.classList.remove('active-warn');
+            updateSelectionVisuals(); // Pour s'assurer que tout est propre
+            saveHistoryState(); // Sauvegarder après suppression
+        }
+        deleteElementBtn.addEventListener('click', () => {
+            if (selectedItems.length === 0) return;
+            deleteSelectedItems();
+        });
+
+        // --- Fonctions de Zoom ---
+        function applyZoom(newZoom, pivotXInContainer, pivotYInContainer) {
+            newZoom = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, newZoom));
+            if (newZoom === zoomLevel) return;
+
+            const oldZoom = zoomLevel;
+            zoomLevel = newZoom;
+
+            // Coordonnées du point de pivot sur le canvas (non-zoomé)
+            const pivotXOnCanvas = (canvasContainer.scrollLeft + pivotXInContainer) / oldZoom;
+            const pivotYOnCanvas = (canvasContainer.scrollTop + pivotYInContainer) / oldZoom;
+
+            canvas.style.transform = `scale(${zoomLevel})`;
+            // canvas.style.transformOrigin = `0 0`; // Déjà défini dans CSS ou par défaut
+
+            // Nouvelles coordonnées de défilement pour garder le point de pivot stable
+            canvasContainer.scrollLeft = pivotXOnCanvas * zoomLevel - pivotXInContainer;
+            canvasContainer.scrollTop = pivotYOnCanvas * zoomLevel - pivotYInContainer;
+        }
+
+        function zoomOnCenter(newZoom) {
+            const rect = canvasContainer.getBoundingClientRect();
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+            applyZoom(newZoom, centerX, centerY);
+        }
+        
+        function resetZoom() {
+            zoomOnCenter(1);
+        }
+
+        // --- Menu Contextuel des Types de Blocs ---
+        function populateBlockContextMenu() {
+            const ul = blockContextMenu.querySelector('ul');
+            ul.innerHTML = ''; // Vider les anciennes options
+            for (const typeKey in blockTypes) {
+                const type = blockTypes[typeKey];
+                const li = document.createElement('li');
+                li.dataset.type = typeKey;
+                
+                const colorIndicator = document.createElement('span');
+                colorIndicator.classList.add('type-color-indicator');
+                colorIndicator.style.backgroundColor = type.color;
+                li.appendChild(colorIndicator);
+                
+                li.appendChild(document.createTextNode(type.label));
+                ul.appendChild(li);
+
+                li.addEventListener('click', () => {
+                    if (currentContextMenuBlockId) {
+                        changeBlockType(currentContextMenuBlockId, typeKey);
+                    }
+                    hideBlockContextMenu();
+                });
+            }
+        }
+
+        function showBlockContextMenu(blockId, pageX, pageY) {
+            // Afficher le menu contextuel seulement si UN SEUL bloc est sélectionné
+            if (selectedItems.length === 1 && selectedItems[0].id === blockId && selectedItems[0].type === 'block') {
+                currentContextMenuBlockId = blockId;
+                blockContextMenu.style.display = 'block';
+                
+                // Positionner le menu
+                const menuWidth = blockContextMenu.offsetWidth;
+                const menuHeight = blockContextMenu.offsetHeight;
+                const windowWidth = window.innerWidth;
+                const windowHeight = window.innerHeight;
+
+                let x = pageX;
+                let y = pageY;
+
+                if (x + menuWidth > windowWidth - 10) {
+                    x = windowWidth - menuWidth - 10;
+                }
+                if (y + menuHeight > windowHeight - 10) {
+                    y = windowHeight - menuHeight - 10;
+                }
+                blockContextMenu.style.left = `${x}px`;
+                blockContextMenu.style.top = `${y}px`;
+            }
+        }
+
+        function hideBlockContextMenu() {
+            if (blockContextMenu.style.display === 'block') {
+                blockContextMenu.style.display = 'none';
+                currentContextMenuBlockId = null;
+            }
+        }
+
+        function changeBlockType(blockId, newTypeKey) {
+            const block = blocks[blockId];
+            if (block && blockTypes[newTypeKey]) {
+                // Enlever l'ancienne classe de type
+                if (block.type && blockTypes[block.type]) {
+                    block.element.classList.remove(`type-${block.type}`);
+                }
+                // Mettre à jour le type et ajouter la nouvelle classe
+                block.type = newTypeKey;
+                block.element.classList.add(`type-${newTypeKey}`);
+                saveHistoryState(); // Sauvegarder après changement de type
+                // La couleur de la bordure est gérée par CSS via la classe .type-*
+            }
+        }
+        
+        // Clic global pour cacher le menu contextuel des blocs
+        document.addEventListener('click', (e) => {
+            if (blockContextMenu && !blockContextMenu.contains(e.target)) { // Vérifier si blockContextMenu existe
+                hideBlockContextMenu();
+            }
+            if (arrowContextMenu && !arrowContextMenu.contains(e.target)) { // Cacher menu flèches
+                hideArrowContextMenu();
+            }
+            // Si on clique en dehors de l'input de label de flèche (et que ce n'est pas la flèche elle-même)
+            const arrowLabelInput = document.getElementById('arrowLabelInput');
+            if (arrowLabelInput && !arrowLabelInput.contains(e.target)) {
+                 // Vérifier si le clic n'est pas sur la flèche elle-même pour éviter double action
+                let targetIsArrowPath = false;
+                if (arrows[currentlyEditingArrowLabel] && e.target === arrows[currentlyEditingArrowLabel].element) {
+                    targetIsArrowPath = true;
+                }
+                if (!targetIsArrowPath) {
+                    saveAndCloseArrowLabelEdit();
+                }
+            }
+        });
+
+        // --- Menu Contextuel des Types de Flèches ---
+        function populateArrowContextMenu() {
+            const ul = arrowContextMenu.querySelector('ul');
+            ul.innerHTML = ''; // Vider les anciennes options
+            for (const typeKey in arrowTypes) {
+                const type = arrowTypes[typeKey];
+                const li = document.createElement('li');
+                li.dataset.type = typeKey;
+                
+                const colorIndicator = document.createElement('span');
+                colorIndicator.classList.add('type-color-indicator');
+                colorIndicator.style.backgroundColor = type.color; // Utiliser la couleur du type de lien
+                li.appendChild(colorIndicator);
+                
+                li.appendChild(document.createTextNode(type.label));
+                ul.appendChild(li);
+
+                li.addEventListener('click', () => {
+                    if (currentContextMenuArrowId) {
+                        changeArrowType(currentContextMenuArrowId, typeKey);
+                    }
+                    hideArrowContextMenu();
+                });
+            }
+        }
+
+        function showArrowContextMenu(arrowId, pageX, pageY) {
+            if (selectedItems.length === 1 && selectedItems[0].id === arrowId && selectedItems[0].type === 'arrow') {
+                currentContextMenuArrowId = arrowId;
+                arrowContextMenu.style.display = 'block';
+                
+                const menuWidth = arrowContextMenu.offsetWidth;
+                const menuHeight = arrowContextMenu.offsetHeight;
+                const windowWidth = window.innerWidth;
+                const windowHeight = window.innerHeight;
+
+                let x = pageX;
+                let y = pageY;
+
+                if (x + menuWidth > windowWidth - 10) x = windowWidth - menuWidth - 10;
+                if (y + menuHeight > windowHeight - 10) y = windowHeight - menuHeight - 10;
+                
+                arrowContextMenu.style.left = `${x}px`;
+                arrowContextMenu.style.top = `${y}px`;
+            }
+        }
+
+        function hideArrowContextMenu() {
+            if (arrowContextMenu.style.display === 'block') {
+                arrowContextMenu.style.display = 'none';
+                currentContextMenuArrowId = null;
+            }
+        }
+
+        function changeArrowType(arrowId, newTypeKey) {
+            const arrow = arrows[arrowId];
+            if (arrow && arrowTypes[newTypeKey]) {
+                // Enlever l'ancienne classe de type de flèche
+                if (arrow.type && arrowTypes[arrow.type]) {
+                    arrow.element.classList.remove(`arrow-type-${arrow.type}`);
+                } else if (arrow.type) { // Ancien type non listé
+                     arrow.element.classList.remove(`arrow-type-${arrow.type}`);
+                } else { // Pas de type précédent, retirer le type par défaut au cas où
+                    arrow.element.classList.remove(`arrow-type-default`);
+                }
+                
+                arrow.type = newTypeKey;
+                arrow.element.classList.add(`arrow-type-${newTypeKey}`);
+                
+                // La couleur de la tête de flèche est gérée par CSS.
+                saveHistoryState(); // Sauvegarder après changement de type de flèche
+                // updateArrowPosition(arrow); // Peut être appelé pour s'assurer que tout est à jour, mais pas strictement nécessaire si seul le style change
+            }
+        }
+
+        // --- Édition des Labels de Flèches ---
+        function startEditingArrowLabel(arrowId, event) {
+            if (document.getElementById('arrowLabelInput')) { // S'il y a déjà un input ouvert
+                saveAndCloseArrowLabelEdit(); // Sauvegarder l'ancien
+            }
+            if (!arrows[arrowId]) return;
+
+            currentlyEditingArrowLabel = arrowId;
+            const arrowData = arrows[arrowId];
+            
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.id = 'arrowLabelInput';
+            input.value = arrowData.label || '';
+            
+            // Positionnement de l'input
+            // Utiliser les coordonnées de l'événement ou le centre de la flèche
+            const canvasRect = canvasContainer.getBoundingClientRect();
+            let inputX, inputY;
+
+            // Calculer le point central de la flèche sur le canevas (non-zoomé)
+            const path = arrowData.element;
+            const d = path.getAttribute('d'); // "M x1 y1 C cx1 cy1 cx2 cy2 x2 y2"
+            const points = d.match(/[-+]?[0-9]*\.?[0-9]+/g).map(parseFloat);
+            if (points && points.length >= 8) {
+                const p0x = points[0], p0y = points[1];
+                const p1x = points[2], p1y = points[3];
+                const p2x = points[4], p2y = points[5];
+                const p3x = points[6], p3y = points[7];
+                const midCanvasX = (p0x + 3 * p1x + 3 * p2x + p3x) / 8;
+                const midCanvasY = (p0y + 3 * p1y + 3 * p2y + p3y) / 8;
+
+                // Convertir en coordonnées de la page
+                inputX = (midCanvasX * zoomLevel) - canvasContainer.scrollLeft + canvasRect.left;
+                inputY = (midCanvasY * zoomLevel) - canvasContainer.scrollTop + canvasRect.top;
+
+            } else { // Fallback sur les coordonnées du clic
+                 inputX = event.clientX;
+                 inputY = event.clientY;
+            }
+            
+            // Ajuster pour que l'input soit centré sur ce point
+            input.style.left = `${inputX - 40}px`; // Approx. half width
+            input.style.top = `${inputY - 15}px`; // Approx. half height
+
+            document.body.appendChild(input);
+            input.focus();
+            input.select();
+
+            input.addEventListener('blur', saveAndCloseArrowLabelEdit);
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    saveAndCloseArrowLabelEdit();
+                    e.preventDefault();
+                } else if (e.key === 'Escape') {
+                    cancelArrowLabelEdit();
+                    e.preventDefault();
+                }
+            });
+        }
+
+        function saveAndCloseArrowLabelEdit() {
+            const input = document.getElementById('arrowLabelInput');
+            if (!input || !currentlyEditingArrowLabel || !arrows[currentlyEditingArrowLabel]) {
+                if(input) input.remove();
+                currentlyEditingArrowLabel = null;
+                return;
+            }
+            
+            const oldLabel = arrows[currentlyEditingArrowLabel].label || '';
+            const newLabel = input.value.trim();
+            if (oldLabel !== newLabel) {
+                arrows[currentlyEditingArrowLabel].label = newLabel;
+                arrows[currentlyEditingArrowLabel].textElement.textContent = newLabel;
+                updateArrowPosition(arrows[currentlyEditingArrowLabel]);
+                saveHistoryState(); // Sauvegarder si le label a changé
+            }
+
+            input.remove();
+            currentlyEditingArrowLabel = null;
+        }
+
+        function cancelArrowLabelEdit() {
+            const input = document.getElementById('arrowLabelInput');
+            if (input) {
+                input.remove();
+            }
+            currentlyEditingArrowLabel = null;
+        }
+
+        // --- Gestion des Groupes de Blocs ---
+        groupBlocksBtn.addEventListener('click', toggleGroupingMode);
+
+        function toggleGroupingMode() {
+            isGroupingModeActive = !isGroupingModeActive;
+            groupBlocksBtn.classList.toggle('active', isGroupingModeActive);
+            // La couleur spécifique (ex: warning-color) est gérée par CSS via .taskbar button#groupBlocksBtn.active
+
+            if (isGroupingModeActive) {
+                deselectAll(); // Désélectionner les items normaux
+                setMode('select'); // Forcer le mode sélection pour éviter conflits
+                // Potentiellement, changer le curseur ou donner une indication visuelle
+                canvasContainer.classList.add('grouping-mode'); // Pour CSS si besoin
+            } else {
+                // Si on quitte le mode en cliquant sur le bouton, on finalise le groupe
+                finalizeGrouping();
+                canvasContainer.classList.remove('grouping-mode');
+            }
+        }
+
+        function toggleBlockForGrouping(blockId) {
+            if (!isGroupingModeActive || !blocks[blockId]) return;
+            const blockElement = blocks[blockId].element;
+            if (pendingGroupBlocks.has(blockId)) {
+                pendingGroupBlocks.delete(blockId);
+                blockElement.classList.remove('pending-group-member');
+            } else {
+                pendingGroupBlocks.add(blockId);
+                blockElement.classList.add('pending-group-member');
+            }
+        }
+
+        function finalizeGrouping() {
+            if (!isGroupingModeActive) return; // Ne rien faire si on n'est plus en mode groupage
+
+            if (pendingGroupBlocks.size >= 2) {
+                const blockIdsToGroup = new Set(pendingGroupBlocks); // Copier
+                // Retirer ces blocs des groupes existants avant de créer le nouveau
+                blockIdsToGroup.forEach(blockId => {
+                    for (const groupId in blockGroups) {
+                        if (blockGroups[groupId].blockIds.has(blockId)) {
+                            removeBlockFromGroup(blockId, groupId);
+                        }
+                    }
+                });
+                createBlockGroup(blockIdsToGroup);
+            }
+            cancelGroupingMode(false); // false pour ne pas re-finaliser
+            if (pendingGroupBlocks.size >= 2) saveHistoryState(); // Sauvegarder si un groupe a été créé
+        }
+        
+        function cancelGroupingMode(processFinalize = true) {
+            if (processFinalize && pendingGroupBlocks.size > 0) {
+                // Optionnel: demander confirmation avant d'annuler si des blocs sont en attente
+                // Pour l'instant, on annule simplement.
+            }
+            pendingGroupBlocks.forEach(blockId => {
+                if (blocks[blockId]) {
+                    blocks[blockId].element.classList.remove('pending-group-member');
+                }
+            });
+            pendingGroupBlocks.clear();
+            if (isGroupingModeActive) { // S'assurer de désactiver le mode
+                isGroupingModeActive = false;
+                groupBlocksBtn.classList.remove('active', 'info-color');
+                canvasContainer.classList.remove('grouping-mode');
+            }
+        }
+
+
+        function handleGroupAction() { // Ancienne fonction, sera remplacée/supprimée ou adaptée
+            // Cette fonction est maintenant gérée par toggleGroupingMode, toggleBlockForGrouping, finalizeGrouping
+            console.warn("handleGroupAction est obsolète et devrait être retirée/révisée.");
+        }
+
+        function createBlockGroup(blockIdsSet, existingGroupId = null, autoSelectGroup = true) {
+            if (blockIdsSet.size < 1) return null; // Ou < 2 si on veut des groupes d'au moins 2
+
+            let groupId;
+            if (existingGroupId) {
+                groupId = existingGroupId;
+                const idNum = parseInt(existingGroupId.split('-')[1]);
+                if (!isNaN(idNum)) groupIdCounter = Math.max(groupIdCounter, idNum);
+            } else {
+                groupIdCounter++;
+                groupId = 'group-' + groupIdCounter;
+            }
+
+            const groupElement = document.createElement('div');
+            groupElement.id = groupId;
+            groupElement.classList.add('block-group');
+            canvas.insertBefore(groupElement, canvas.firstChild); // Insérer derrière les blocs
+
+            blockGroups[groupId] = {
+                id: groupId,
+                element: groupElement,
+                blockIds: new Set(blockIdsSet) // Copier le Set
+            };
+
+            updateBlockGroupBounds(groupId);
+            // if (autoSelectGroup) { /* Logique de sélection de groupe à définir */ }
+            // Ne pas appeler saveHistoryState ici, car createBlockGroup est utilisé par loadCanvasState.
+            // L'appel est fait par finalizeGrouping.
+            return groupId;
+        }
+
+        function updateBlockGroupBounds(groupId) {
+            const group = blockGroups[groupId];
+            if (!group || group.blockIds.size === 0) {
+                if (group && group.element) group.element.remove();
+                delete blockGroups[groupId];
+                return;
+            }
+
+            let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+            let hasVisibleBlocks = false;
+
+            group.blockIds.forEach(blockId => {
+                const block = blocks[blockId];
+                if (block && block.element) {
+                    hasVisibleBlocks = true;
+                    const rect = block.element; // L'élément lui-même est déjà positionné
+                    minX = Math.min(minX, block.x);
+                    minY = Math.min(minY, block.y);
+                    maxX = Math.max(maxX, block.x + rect.offsetWidth);
+                    maxY = Math.max(maxY, block.y + rect.offsetHeight);
+                }
+            });
+
+            if (!hasVisibleBlocks) { // Si tous les blocs du groupe ont été supprimés
+                deleteBlockGroup(groupId);
+                return;
+            }
+            
+            const padding = 15; // Doit correspondre au padding CSS du .block-group
+            group.element.style.left = (minX - padding) + 'px';
+            group.element.style.top = (minY - padding) + 'px';
+            group.element.style.width = (maxX - minX + 2 * padding) + 'px';
+            group.element.style.height = (maxY - minY + 2 * padding) + 'px';
+        }
+        
+        function removeBlockFromGroup(blockId, groupId, blockIsBeingDeleted = false) {
+            const group = blockGroups[groupId];
+            if (group && group.blockIds.has(blockId)) {
+                group.blockIds.delete(blockId);
+                if (group.blockIds.size < 1 && !blockIsBeingDeleted) { // Ou < 2 si on veut des groupes d'au moins 2
+                    // Si le groupe devient trop petit (et que ce n'est pas parce que le bloc est en train d'être supprimé)
+                    // on supprime le groupe.
+                    deleteBlockGroup(groupId);
+                } else if (group.blockIds.size === 0 && blockIsBeingDeleted) {
+                    // Si le bloc est supprimé et que c'était le dernier du groupe
+                    deleteBlockGroup(groupId);
+                }
+                 else {
+                    updateBlockGroupBounds(groupId);
+                }
+            }
+        }
+
+        function deleteBlockGroup(groupId) {
+            const group = blockGroups[groupId];
+            if (group) {
+                if (group.element) group.element.remove();
+                delete blockGroups[groupId];
+            }
+        }
+
+        // --- Points de Connexion Visuels ---
+        function showConnectionPointsOnAllBlocks() {
+            Object.values(blocks).forEach(block => {
+                if (block.element) {
+                    createConnectionPointsForBlock(block);
+                }
+            });
+        }
+
+        function hideConnectionPointsOnAllBlocks() {
+            Object.values(blocks).forEach(block => {
+                if (block.connectionPoints && block.connectionPoints.length > 0) {
+                    block.connectionPoints.forEach(point => point.remove());
+                    block.connectionPoints = [];
+                }
+            });
+        }
+        
+        function createConnectionPointsForBlock(block) {
+            // S'assurer de ne pas dupliquer les points
+            if (block.connectionPoints && block.connectionPoints.length > 0) {
+                block.connectionPoints.forEach(p => p.remove());
+                block.connectionPoints = [];
+            }
+
+            const blockElem = block.element;
+            const pointsData = [
+                { id: 'top', style: { top: '0%', left: '50%'} },
+                { id: 'bottom', style: { top: '100%', left: '50%'} },
+                { id: 'left', style: { top: '50%', left: '0%'} },
+                { id: 'right', style: { top: '50%', left: '100%'} }
+            ];
+
+            pointsData.forEach(pData => {
+                const point = document.createElement('div');
+                point.classList.add('connection-point');
+                point.dataset.blockId = block.id;
+                point.dataset.pointId = pData.id;
+                Object.assign(point.style, pData.style);
+                
+                point.addEventListener('click', (e) => {
+                    e.stopPropagation(); // Empêcher le clic de se propager au bloc parent
+                    if (currentMode === 'connect') {
+                        handleArrowEndpointSelection(block.id, pData.id);
+                    }
+                });
+                blockElem.appendChild(point);
+                block.connectionPoints.push(point);
+            });
+        }
+
+        // Adapter setMode pour gérer les points de connexion
+        const originalSetMode = setMode;
+        setMode = function(newMode) {
+            const oldMode = currentMode; // currentMode sera mis à jour par originalSetMode
+            originalSetMode.call(this, newMode); // Appeler la fonction setMode originale
+
+            if (newMode === 'connect') {
+                showConnectionPointsOnAllBlocks();
+                Object.values(blocks).forEach(b => { 
+                    if (b.element) b.element.classList.add('block-in-connect-mode');
+                });
+            } else if (oldMode === 'connect' && newMode !== 'connect') { // Si on quitte le mode connexion
+                hideConnectionPointsOnAllBlocks();
+                Object.values(blocks).forEach(b => {
+                    if (b.element) b.element.classList.remove('block-in-connect-mode');
+                });
+            }
+
+
+            if (newMode !== 'select' && isGroupingModeActive) { 
+                cancelGroupingMode();
+            }
+        };
+
+
+        // Initialisation
+        setMode('select'); // Assure que le mode select est actif et stylé correctement au démarrage
+        // toggleTextPanelBtn.classList.toggle('active', textInputPanel.classList.contains('open'));
+        // La ligne ci-dessus est redondante si togglePanel est appelé ou si l'état initial est géré
+        if (textInputPanel.classList.contains('open')) { // Assurer la cohérence initiale du bouton panneau
+            toggleTextPanelBtn.classList.add('active');
+        }
+        populateBlockContextMenu(); // Remplir le menu contextuel une fois au chargement
+        populateArrowContextMenu(); // Remplir le menu contextuel des flèches
+        switchTab('yourText'); // S'assurer que le premier onglet est actif au démarrage
+        saveHistoryState(); // Sauvegarder l'état initial
+        updateUndoRedoButtons(); // Mettre à jour l'état des boutons Annuler/Refaire
+
+        // Centrer la vue initiale
+        const initialScrollX = (canvas.offsetWidth / 2) - (canvasContainer.offsetWidth / 2);
+        const initialScrollY = (canvas.offsetHeight / 2) - (canvasContainer.offsetHeight / 2);
+        canvasContainer.scrollLeft = initialScrollX > 0 ? initialScrollX : 0;
+        canvasContainer.scrollTop = initialScrollY > 0 ? initialScrollY : 0;
+    });
+    </script>
+
+</body>
+</html>
