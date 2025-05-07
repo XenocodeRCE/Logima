@@ -6,79 +6,83 @@ L'outil permet de "découper" un texte en unités logiques, de déplacer ces uni
 
 **[➡️ Essayez Logima en direct !](https://philo-lycee.fr/outils/logima.php)** 
 
-![](https://i.imgur.com/FLzfRZv.png)
+![](https://i.imgur.com/uCrPXS2.png)
 
 ## Table des Matières
 
-*   [Fonctionnalités Clés](#fonctionnalités-clés-)
-*   [Comment Utiliser Logima](#comment-utiliser-logima-)
-*   [Licence](#licence-)
+* [Fonctionnalités Clés](#fonctionnalités-clés-)
+* [Comment Utiliser Logima](#comment-utiliser-logima-)
+* [Licence](#licence-)
 
 ## Fonctionnalités Clés 🚀
 
-*   **Panneau de Texte Latéral :** Un espace dédié pour coller et travailler avec votre texte source, escamotable pour maximiser l'espace de travail.
-*   **Création Intuitive de Blocs :**
-    *   **Menu Contextuel :** Sélectionnez du texte dans le panneau et un petit menu apparaît pour créer un bloc instantanément.
-    *   **Glisser-Déposer :** Sélectionnez du texte et glissez-le directement sur le canevas pour créer un bloc.
-    *   **Bouton Dédié :** Utilisez le bouton sur la barre d'outils pour créer un bloc à partir du texte sélectionné dans le panneau.
-*   **Canevas Interactif :**
-    *   **Déplacement Libre :** Organisez vos blocs d'arguments comme vous le souhaitez sur une vaste surface de travail.
-    *   **Liens Visuels :** Reliez les blocs avec des flèches courbées élégantes pour indiquer les relations logiques.
-*   **Modes d'Interaction Clairs :**
-    *   🖐️ **Mode Main (Panoramique) (`H`):** Déplacez-vous librement sur le canevas sans affecter les éléments.
-    *   👆 **Mode Sélection (`S`):** Sélectionnez, déplacez et gérez les blocs et les flèches.
-    *   🔗 **Mode Connexion (`C`):** Dessinez des flèches entre les blocs.
-    *   ✏️ **Mode Édition (`E`):** Modifiez le contenu textuel des blocs existants.
-*   **Édition Facile :**
-    *   Modifiez le texte d'un bloc via le mode "Édition" ou simplement en double-cliquant dessus.
-*   **Interface Moderne et Épurée :**
-    *   Barre d'outils inférieure de type "taskbar" avec des icônes claires.
-    *   Design soigné avec des bords arrondis et des transitions fluides.
-    *   Aucune barre de défilement visible pour une immersion maximale (navigation par mode Main ou molette).
-*   **Raccourcis Clavier :** Accélérez votre travail avec des raccourcis intuitifs pour les actions courantes.
-*   **Autonome :** Fonctionne entièrement dans le navigateur, sans besoin de backend ou d'installation complexe.
+- **Panneau de Texte Latéral**  
+  - Coller, éditer et sélectionner votre texte source.
+  - Onglet « Source (JSON) » pour exporter/importer toute la structure du canevas.
+  - Application directe d’un JSON pour restaurer ou partager un travail.
+- **Création Intuitive de Blocs**  
+  - Sélection de texte puis glisser-déposer sur le canevas.
+  - Création rapide d’un bloc vide via la barre d’outils ou le raccourci `N`.
+  - Menu contextuel sur chaque bloc pour changer son type (prémisse, conclusion, définition, etc.).
+- **Types de Blocs Riches**  
+  - Prémisse, Conclusion, Définition/Rappel, Distinction, Synthèse, Limite/Objection, Explication/Justification, Méta-proposition, Problème, Thèse pivot, Conclusion principale, Argument par défaut.
+  - Chaque type possède une couleur et un style visuel distinct.
+- **Canevas Interactif et Infini**  
+  - Déplacement libre des blocs (drag & drop).
+  - Zoom fluide (molette + Ctrl ou mode Zoom).
+  - Panoramique (mode Main).
+  - Navigation sans barres de défilement visibles.
+- **Liens Visuels et Typés**  
+  - Création de flèches courbées entre blocs via points de connexion (haut, bas, gauche, droite).
+  - Types de liens : Implication, Justification, Opposition, Lien par défaut.
+  - Menu contextuel sur chaque flèche pour changer son type.
+  - Édition du label des flèches (double-clic).
+- **Groupes de Blocs**  
+  - Sélection de plusieurs blocs pour les regrouper visuellement (mode Groupage, raccourci `G`).
+  - Déplacement synchronisé des blocs d’un même groupe.
+- **Modes d’Interaction Clairs**  
+  - 🖐️ Main (Panoramique) (`H`)
+  - 👆 Sélection (`S`)
+  - 🔗 Connexion (`C`)
+  - ✏️ Édition (`E`)
+  - 🔍 Zoom (`Z`)
+  - 🗂️ Groupage (`G`)
+- **Édition Facile**  
+  - Double-clic ou mode Édition pour modifier le texte d’un bloc.
+  - Annulation (`Ctrl+Z`) et rétablissement (`Ctrl+Y`) de toutes les actions (déplacement, création, suppression, édition…).
+- **Suppression Rapide**  
+  - Sélectionnez un ou plusieurs blocs/flèches puis supprimez-les (`Suppr` ou bouton poubelle).
+- **Interface Moderne et Épurée**  
+  - Barre d’outils inférieure avec icônes claires et séparateurs.
+  - Design responsive, transitions fluides, bords arrondis.
+  - Thème clair, couleurs personnalisées pour chaque type d’élément.
+- **Raccourcis Clavier Intuitifs**  
+  - `T` : Ouvrir/fermer le panneau de texte
+  - `N` : Nouveau bloc vide
+  - `G` : Mode groupage
+  - `H` : Main, `S` : Sélection, `C` : Connexion, `E` : Édition, `Z` : Zoom
+  - `Ctrl+Z`/`Ctrl+Y` : Annuler/Refaire
+  - `Suppr`/`Retour arrière` : Supprimer
+  - `Échap` : Annuler, désélectionner, fermer panneau ou menu contextuel
+  - `Ctrl + / - / 0` : Zoom avant/arrière/reset
+- **Autonome et Sans Installation**  
+  - Fonctionne entièrement dans le navigateur, aucune installation ni backend requis.
+  - Export/Import facile de vos cartes argumentatives.
 
 ## Comment Utiliser Logima 💡
 
-1.  **Ouvrir Logima :**
-    *   Accédez simplement à l'URL fournie.
-    *   Sinon, téléchargez le fichier `logima.html` et ouvrez-le dans votre navigateur web moderne préféré (Chrome, Firefox, Edge, Safari).
-
-2.  **Afficher le Panneau de Texte :**
-    *   Cliquez sur l'icône "Menu" (☰) sur la barre d'outils en bas, ou appuyez sur la touche `T`.
-
-3.  **Coller Votre Texte :**
-    *   Collez le texte que vous souhaitez analyser dans la zone de texte du panneau latéral.
-
-4.  **Créer des Blocs d'Arguments :**
-    *   **Option 1 (Menu Contextuel) :** Sélectionnez une portion de texte dans le panneau. Un petit menu flottant apparaîtra près de votre curseur. Cliquez sur "Créer bloc".
-    *   **Option 2 (Glisser-Déposer) :** Sélectionnez une portion de texte, puis cliquez et maintenez pour la glisser directement sur la zone de travail principale. Relâchez pour créer le bloc.
-    *   **Option 3 (Barre d'outils) :** Sélectionnez du texte dans le panneau, puis cliquez sur l'icône "Créer Bloc" (+) sur la barre d'outils.
-
-5.  **Organiser et Relier :**
-    *   🖐️ **Mode Main (`H`) :** Cliquez et glissez sur le canevas pour vous déplacer. Utilisez aussi la molette de la souris.
-    *   👆 **Mode Sélection (`S`) :**
-        *   Cliquez sur un bloc pour le sélectionner.
-        *   Cliquez et maintenez sur un bloc sélectionné pour le déplacer.
-        *   Cliquez sur une flèche pour la sélectionner.
-    *   🔗 **Mode Connexion (`C`) :**
-        *   Cliquez sur un bloc de départ, puis sur un bloc d'arrivée pour tracer une flèche courbée.
-    *   ✏️ **Mode Édition (`E`) :**
-        *   Cliquez sur le texte d'un bloc pour le modifier. Appuyez sur `Entrée` pour sauvegarder ou `Échap` pour annuler. Un clic en dehors du bloc valide également.
-        *   Vous pouvez aussi **double-cliquer** sur un bloc (dans n'importe quel mode sauf Panoramique) pour l'éditer directement.
-
-6.  **Supprimer des Éléments :**
-    *   Sélectionnez un bloc ou une flèche en mode "Sélection".
-    *   Cliquez sur l'icône "Poubelle" (🗑️) sur la barre d'outils, ou appuyez sur la touche `Suppr` ou `Retour arrière`.
-
-7.  **Raccourcis Clavier Utiles :**
-    *   `T` : Afficher/Masquer le panneau de texte.
-    *   `H` : Activer le mode Main (Panoramique).
-    *   `S` : Activer le mode Sélection.
-    *   `C` : Activer le mode Connexion.
-    *   `E` : Activer le mode Édition.
-    *   `Suppr` / `Retour arrière` : Supprimer l'élément sélectionné.
-    *   `Échap` : Annuler l'action en cours (dessin de flèche, édition de texte), désélectionner, ou fermer le panneau de texte.
+1. **Ouvrir Logima**  
+   - Accédez à l’URL ou ouvrez `logima.html` dans votre navigateur.
+2. **Afficher le Panneau de Texte**  
+   - Cliquez sur ☰ ou appuyez sur `T`.
+3. **Coller et Sélectionner du Texte**  
+   - Travaillez votre texte source dans le panneau latéral.
+4. **Créer des Blocs**  
+   - Sélectionnez du texte puis glissez-le sur le canevas, ou utilisez le bouton « Nouveau Bloc ».
+5. **Organiser, Relier, Grouper**  
+   - Déplacez, reliez, groupez vos blocs selon la structure logique du texte.
+6. **Éditer, Annoter, Exporter**  
+   - Double-cliquez pour éditer, ajoutez des labels aux flèches, exportez votre travail en JSON.
 
 ## Licence 📄
 
